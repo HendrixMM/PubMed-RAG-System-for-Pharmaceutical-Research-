@@ -744,16 +744,16 @@ if nvidia_build_health < threshold:
 - **Feature Mapping**: [docs/FEATURES.md](FEATURES.md) - Comprehensive feature list
 - **Deployment Guide**: [docs/DEPLOYMENT.md](DEPLOYMENT.md) - Deployment instructions and options
 - **API Integration**: [docs/API_INTEGRATION_GUIDE.md](API_INTEGRATION_GUIDE.md) - NVIDIA API integration patterns
-- **Security Policy**: [../SECURITY.md](../SECURITY.md) - Security procedures and incident response
-- **Contributing**: [../CONTRIBUTING.md](../CONTRIBUTING.md) - Development workflow and standards
+- **Security Policy**: [SECURITY.md](SECURITY.md) - Security procedures and incident response
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow and standards
 
 ### Referenced Files
 
-- **Guardrails Configuration**: [guardrails/config.yml](../guardrails/config.yml)
-- **Input Rails**: [guardrails/rails/input_rails.co](../guardrails/rails/input_rails.co)
-- **Retrieval Rails**: [guardrails/rails/retrieval_rails.co](../guardrails/rails/retrieval_rails.co)
-- **Output Rails**: [guardrails/rails/output_rails.co](../guardrails/rails/output_rails.co)
-- **Core Implementation**: [src/enhanced_rag_agent.py](../src/enhanced_rag_agent.py)
+- **Guardrails Configuration**: [`guardrails/config.yml`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/guardrails/config.yml)
+- **Input Rails**: [`guardrails/rails/input_rails.co`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/guardrails/rails/input_rails.co)
+- **Retrieval Rails**: [`guardrails/rails/retrieval_rails.co`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/guardrails/rails/retrieval_rails.co)
+- **Output Rails**: [`guardrails/rails/output_rails.co`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/guardrails/rails/output_rails.co)
+- **Core Implementation**: [`src/enhanced_rag_agent.py`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/src/enhanced_rag_agent.py)
 
 ---
 

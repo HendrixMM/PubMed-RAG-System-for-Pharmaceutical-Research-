@@ -595,8 +595,8 @@ print(f"Recommended reranking model: {recommendations['reranking_model']}")
 - [NVIDIA NIM Documentation](https://docs.nvidia.com/nim/)
 - [NeMo Retriever Guide](https://docs.nvidia.com/nemo/retriever/)
 - [API Reference](https://docs.api.nvidia.com/)
-- [MCP Documentation Context Service](../src/mcp_documentation_context.py) - Live documentation integration
-- [Pipeline Configuration Guide](../mcp_config.json) - MCP server configuration
+- [MCP Documentation Context Service](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/src/mcp_documentation_context.py) - Live documentation integration
+- [Pipeline Configuration Guide](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/mcp_config.json) - MCP server configuration
 
 ### Community
 

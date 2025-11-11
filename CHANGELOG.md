@@ -15,6 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (Phase 2.2)
+
+- Introduced the Architecture Decision Record program with `docs/adr/template.md` and `docs/adr/0001-use-nemo-retriever.md`.
+- Landed `docs/BENCHMARKS.md` as the canonical benchmark / dataset guide with manifest references.
+
+### Changed (Phase 2.2)
+
+- Hardened `mkdocs.yml` (Material theme, strict mode, navigation cleanup) and aligned `requirements-dev.txt` to include MkDocs + `mcp-use` dependencies.
+- Embedded a Mermaid-based diagnostic decision tree inside `docs/TROUBLESHOOTING_GUIDE.md` for faster incident triage.
+
+### Documentation (Phase 2.2)
+
+- Expanded `docs/API_REFERENCE.md` with validated reranking endpoints, quotas, and troubleshooting guidance.
+- Rebuilt `docs/EXAMPLES.md` with runnable imports, prerequisites per section, and MCP integration updates.
+
 ### Security
 
 - CRITICAL: Completed git history cleanup to remove exposed API keys

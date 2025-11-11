@@ -33,16 +33,16 @@ theme:
     text: Roboto
     code: Roboto Mono
   features:
-    - navigation.instant      # Instant loading
-    - navigation.tracking     # URL updates with scroll
-    - navigation.tabs         # Top-level sections as tabs
-    - navigation.sections     # Sections in navigation
-    - navigation.expand       # Expand sections by default
-    - navigation.top          # Back to top button
-    - search.suggest          # Search suggestions
-    - search.highlight        # Highlight search terms
-    - content.code.copy       # Copy button for code blocks
-    - content.code.annotate   # Annotations in code blocks
+    - navigation.instant # Instant loading
+    - navigation.tracking # URL updates with scroll
+    - navigation.tabs # Top-level sections as tabs
+    - navigation.sections # Sections in navigation
+    - navigation.expand # Expand sections by default
+    - navigation.top # Back to top button
+    - search.suggest # Search suggestions
+    - search.highlight # Highlight search terms
+    - content.code.copy # Copy button for code blocks
+    - content.code.annotate # Annotations in code blocks
   icon:
     repo: fontawesome/brands/github
     edit: material/pencil
@@ -106,7 +106,7 @@ nav:
   - Home: index.md
   - Getting Started:
       - Installation: INSTALLATION.md
-      - Quick Start: QUICK_START.md
+      - Quick Start: technical-history/QUICK_START.md
       - Configuration: CONFIGURATION.md
   - Documentation:
       - API Reference: API_REFERENCE.md
@@ -161,8 +161,8 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 # Validation and build settings
-strict: true              # Fail build on warnings
-use_directory_urls: true  # Use directory URLs (prettier)
+strict: true # Fail build on warnings
+use_directory_urls: true # Use directory URLs (prettier)
 
 # Copyright
 copyright: Copyright &copy; 2025 Pharmaceutical RAG Template Contributors

@@ -109,4 +109,4 @@ Cloud-first with NVIDIA Build for speed and reliability, with optional self-host
 - Configuration: [docs/API_REFERENCE.md](API_REFERENCE.md)
 - Troubleshooting: [docs/TROUBLESHOOTING_GUIDE.md](TROUBLESHOOTING_GUIDE.md)
 - Architecture rationale: [docs/NGC_DEPRECATION_IMMUNITY.md](NGC_DEPRECATION_IMMUNITY.md)
-- Security: [../SECURITY.md](../SECURITY.md)
+- Security: [SECURITY.md](SECURITY.md)

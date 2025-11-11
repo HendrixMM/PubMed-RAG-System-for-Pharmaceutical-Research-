@@ -31,11 +31,18 @@ import logging
 import os
 import re
 import sys
+import threading
 import time
 import urllib.parse
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Set
+from typing import Tuple
 
 ApifyClient = None  # Apify removed
 ApifyApiError = None  # Apify removed
@@ -99,6 +106,11 @@ except ImportError:  # pragma: no cover - allows use without optional module dur
     RateLimitStatus = None  # type: ignore
     DailyQuotaExceeded = None  # type: ignore
     get_process_limiter = None  # type: ignore
+
+try:
+    from .cache_management import NCBICacheManager
+except Exception:  # pragma: no cover - cache layer optional
+    NCBICacheManager = None  # type: ignore
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -177,6 +189,12 @@ class PubMedScraper:
         cache_ttl_seconds: Optional[int] = None,
         rate_limiter: Optional["NCBIRateLimiter"] = None,
         enable_rate_limiting: Optional[bool] = None,
+        *,
+        enable_advanced_caching: Optional[bool] = None,
+        cache_manager: Optional["NCBICacheManager"] = None,
+        use_normalized_cache_keys: Optional[bool] = None,
+        mirror_legacy_cache: Optional[bool] = None,
+        prune_legacy_cache: Optional[bool] = None,
     ):
         """
         Initialize PubMed scraper
@@ -190,6 +208,15 @@ class PubMedScraper:
                 created automatically using `NCBIRateLimiter.from_env()`.
             enable_rate_limiting: Optional override for enabling rate limiting
                 regardless of environment configuration.
+            enable_advanced_caching: Toggle for the metadata-rich cache
+                manager. Defaults to ENABLE_ADVANCED_CACHING env flag.
+            cache_manager: Optional pre-built `NCBICacheManager` instance.
+            use_normalized_cache_keys: When True, stores normalized cache keys
+                compatible with the advanced cache backend.
+            mirror_legacy_cache: When True, persists results to the legacy
+                JSON cache directory alongside the advanced backend.
+            prune_legacy_cache: When True, removes migrated legacy cache
+                entries after successfully writing to the advanced backend.
 
         For multi-instance deployments, pass a shared `NCBIRateLimiter` (for
         example the process-wide limiter returned by
@@ -202,6 +229,41 @@ class PubMedScraper:
         self.actor_id = None
         self.cache_dir = Path(cache_dir or os.getenv("PUBMED_CACHE_DIR", "./pubmed_cache"))
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # Advanced caching setup (optional)
+        self._cache_context = threading.local()
+        advanced_requested = (
+            enable_advanced_caching
+            if enable_advanced_caching is not None
+            else _env_true("ENABLE_ADVANCED_CACHING", False)
+        )
+        self._cache_manager: Optional[NCBICacheManager] = cache_manager
+        if advanced_requested and self._cache_manager is None and NCBICacheManager is not None:
+            try:
+                self._cache_manager = NCBICacheManager.from_env()
+            except Exception as exc:  # pragma: no cover - environment dependent
+                logger.warning("Failed to initialize advanced PubMed cache manager: %s", exc)
+                self._cache_manager = None
+        elif advanced_requested and NCBICacheManager is None:
+            logger.debug("Advanced caching requested but cache_management module unavailable.")
+
+        self._use_normalized_cache_keys = (
+            bool(use_normalized_cache_keys)
+            if use_normalized_cache_keys is not None
+            else _env_true("USE_NORMALIZED_CACHE_KEYS", False)
+        )
+        self._mirror_legacy_root = (
+            bool(mirror_legacy_cache) if mirror_legacy_cache is not None else _env_true("MIRROR_TO_LEGACY_ROOT", False)
+        )
+        self._prune_legacy_after_migration = (
+            bool(prune_legacy_cache)
+            if prune_legacy_cache is not None
+            else _env_true("PRUNE_LEGACY_AFTER_MIGRATION", False)
+        )
+        if self._cache_manager is None:
+            self._use_normalized_cache_keys = False
+            self._mirror_legacy_root = False
+            self._prune_legacy_after_migration = False
 
         # Load configuration from environment
         self.default_max_items = int(os.getenv("DEFAULT_MAX_ITEMS", "30"))
@@ -578,6 +640,150 @@ class PubMedScraper:
             return None
         return self.rate_limiter.remaining_daily_requests()
 
+    # ------------------------------------------------------------------
+    # Advanced cache helpers (optional)
+    # ------------------------------------------------------------------
+
+    def _advanced_cache_active(self) -> bool:
+        return bool(self._cache_manager)
+
+    def _get_cache_context(self) -> Dict[str, Any]:
+        ctx = getattr(self._cache_context, "value", None)
+        if not isinstance(ctx, dict):
+            ctx = {}
+            self._cache_context.value = ctx
+        return ctx
+
+    def _update_cache_context(self, **updates: Any) -> None:
+        if not self._advanced_cache_active():
+            return
+        ctx = self._get_cache_context()
+        ctx.update(updates)
+        self._cache_context.value = ctx
+
+    def _clear_cache_context(self) -> None:
+        if hasattr(self._cache_context, "value"):
+            self._cache_context.value = {}
+
+    def _prepare_cache_metadata(self, result_count: int) -> Dict[str, Any]:
+        context = self._get_cache_context()
+        metadata = {
+            "original_query": context.get("original_query", ""),
+            "enhanced_query": context.get("enhanced_query", context.get("original_query", "")),
+            "parameters": context.get("parameters", {}),
+            "result_count": result_count,
+        }
+        metadata["status"] = "empty" if result_count == 0 else "success"
+        if "cache_key" in context:
+            metadata["cache_key"] = context["cache_key"]
+        if "legacy_cache_key" in context:
+            metadata["legacy_cache_key"] = context["legacy_cache_key"]
+        return metadata
+
+    def get_cache_manager(self) -> Optional["NCBICacheManager"]:
+        return self._cache_manager
+
+    def cache_status_report(self) -> Dict[str, Any]:
+        if not self._advanced_cache_active():
+            return {"enabled": False}
+        manager = self._cache_manager  # Keep local for mypy
+        if manager is None:
+            return {"enabled": False}
+        return {
+            "enabled": True,
+            "backend": getattr(manager, "cache_backend", "file"),
+            "directory": str(getattr(manager, "cache_dir", self.cache_dir)),
+            "entry_directory": str(getattr(manager, "advanced_cache_dir", self.cache_dir / "advanced")),
+            "statistics": manager.get_statistics() if hasattr(manager, "get_statistics") else {},
+            "warm_queue_size": (
+                manager.warming_scheduler.pending_count() if getattr(manager, "cache_warming_enabled", False) else 0
+            ),
+        }
+
+    def warm_cache_entries(self) -> Dict[str, Dict[str, Any]]:
+        if not self._advanced_cache_active():
+            return {}
+        manager = self._cache_manager
+        if manager is None or not hasattr(manager, "warmable_entries"):
+            return {}
+        return manager.warmable_entries()
+
+    def combined_status_report(self) -> Dict[str, Any]:
+        report: Dict[str, Any] = {"cache": self.cache_status_report()}
+        status = self.get_rate_limit_status()
+        if status is not None and hasattr(status, "__dict__"):
+            report["rate_limit"] = asdict(status) if hasattr(status, "__dataclass_fields__") else status.__dict__
+        else:
+            report["rate_limit"] = None
+        return report
+
+    def _get_cached_results_advanced(self, cache_key: str, apply_ranking: bool) -> Optional[List[Dict]]:
+        if not self._advanced_cache_active():
+            return None
+        lookup = None
+        try:
+            lookup = self._cache_manager.get(cache_key, allow_stale=True)  # type: ignore[union-attr]
+        except Exception as exc:  # pragma: no cover - cache backend failures
+            logger.warning("Advanced cache lookup failed for %s: %s", cache_key, exc)
+            return None
+
+        if lookup is None:
+            return None
+
+        results = lookup.payload
+        if isinstance(results, list) and apply_ranking and results:
+            needs_ranking = any("ranking_score" not in result for result in results if isinstance(result, dict))
+            if needs_ranking:
+                logger.info("Recomputing ranking for advanced cached results missing ranking scores")
+                for result in results:
+                    if isinstance(result, dict) and "ranking_score" not in result:
+                        self._apply_study_ranking(result)
+                results.sort(key=lambda r: r.get("ranking_score", 0) if isinstance(r, dict) else 0, reverse=True)
+                try:
+                    status = str(getattr(lookup.metadata, "get", lambda *a, **k: "success")("status", "success"))
+                except Exception:
+                    status = "success"
+                try:
+                    self._cache_manager.set(  # type: ignore[union-attr]
+                        cache_key,
+                        results,
+                        metadata=lookup.metadata,
+                        status=status,
+                        preserve_expiry=True,
+                    )
+                except Exception as exc:  # pragma: no cover - best effort
+                    logger.debug("Failed to persist recomputed ranking metadata for %s: %s", cache_key, exc)
+
+        if lookup.stale:
+            logger.info("Serving stale cached results for key %s; cache warming scheduled", cache_key)
+
+        return results
+
+    def _cache_results_advanced(self, cache_key: str, results: List[Dict]) -> bool:
+        if not self._advanced_cache_active():
+            return False
+
+        metadata = self._prepare_cache_metadata(len(results))
+        status = metadata.get("status", "success")
+        try:
+            self._cache_manager.set(cache_key, results, metadata=metadata, status=status)  # type: ignore[union-attr]
+            if self._mirror_legacy_root:
+                self._write_legacy_cache_file(cache_key, results)
+            return True
+        except Exception as exc:  # pragma: no cover - falls back to legacy cache
+            logger.warning("Failed to store advanced cache entry for %s: %s", cache_key, exc)
+            return False
+        finally:
+            self._clear_cache_context()
+
+    def _write_legacy_cache_file(self, cache_key: str, results: List[Dict]) -> None:
+        cache_file = self.cache_dir / f"{cache_key}.json"
+        try:
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(results, f, indent=2, ensure_ascii=False)
+        except Exception as exc:  # pragma: no cover - best effort
+            logger.debug("Failed to mirror cache entry %s to legacy directory: %s", cache_key, exc)
+
     # EasyAPI input construction removed
 
     def _get_cache_key(
@@ -601,15 +807,27 @@ class PubMedScraper:
             f"pharmaMax={self.pharma_max_terms}:"
             f"v={CACHE_SCHEMA_VERSION}"
         )
-        return hashlib.md5(content.encode()).hexdigest()
+        cache_key = hashlib.md5(content.encode()).hexdigest()
+        if self._advanced_cache_active():
+            self._update_cache_context(
+                cache_key=cache_key,
+                legacy_cache_key=cache_key,
+                parameters={
+                    "max_items": max_items,
+                    "apply_ranking": apply_ranking,
+                    "pharma_enhance_enabled": pharma_enhance_enabled,
+                    "include_tags": include_tags_effective,
+                    "include_abstract": include_abstract_effective,
+                    "preserve_order": preserve_order,
+                },
+            )
+        return cache_key
 
     def _get_cached_results(self, cache_key: str, apply_ranking: bool) -> Optional[List[Dict]]:
         """Get cached results if they exist and are not expired"""
-        advanced_cache_file = self.cache_dir / "advanced" / f"{cache_key}.json"
-        if advanced_cache_file.exists():
-            # Advanced caching takes precedence when present so that newer backends own the key lifecycle.
-            logger.debug("Ignoring advanced cache entry for key %s in legacy cache lookup", cache_key)
-            return None
+        advanced_results = self._get_cached_results_advanced(cache_key, apply_ranking)
+        if advanced_results is not None:
+            return advanced_results
 
         cache_file = self.cache_dir / f"{cache_key}.json"
 
@@ -669,6 +887,10 @@ class PubMedScraper:
         """Cache results to disk"""
         if not results and not self.cache_empty_results:
             return
+
+        if self._cache_results_advanced(cache_key, results):
+            return
+
         try:
             cache_file = self.cache_dir / f"{cache_key}.json"
             with open(cache_file, "w", encoding="utf-8") as f:
@@ -684,6 +906,9 @@ class PubMedScraper:
 
         except Exception as e:
             logger.warning(f"Failed to cache results: {str(e)}")
+        finally:
+            if self._advanced_cache_active():
+                self._clear_cache_context()
 
     def _normalize_doi(self, doi: str) -> str:
         """Normalize DOI using shared utility function"""
@@ -692,6 +917,8 @@ class PubMedScraper:
     def _enhance_pharmaceutical_query(self, query: str, enhancement_enabled: bool) -> str:
         """Enhance pharmaceutical queries with relevant synonyms and keywords."""
         if not enhancement_enabled:
+            if self._advanced_cache_active():
+                self._update_cache_context(original_query=query, enhanced_query=query)
             return query
 
         allow_advanced = _env_true("ENABLE_PHARMA_ENHANCE_ADVANCED", False)
@@ -727,6 +954,8 @@ class PubMedScraper:
             logger.debug(
                 "Skipping pharma enhancement: advanced query features detected and ENABLE_PHARMA_ENHANCE_ADVANCED is false"
             )
+            if self._advanced_cache_active():
+                self._update_cache_context(original_query=query, enhanced_query=query)
             return query
 
         query_lower = query.lower()
@@ -767,6 +996,8 @@ class PubMedScraper:
 
         if not has_signal:
             logger.debug("Skipping pharma enhancement: no pharmacology signal detected in query '%s'", query)
+            if self._advanced_cache_active():
+                self._update_cache_context(original_query=query, enhanced_query=enhanced_query)
             return enhanced_query
 
         enhanced_terms: List[str] = []
@@ -841,10 +1072,16 @@ class PubMedScraper:
                     self.max_query_length,
                     final_enhanced_query,
                 )
+                if self._advanced_cache_active():
+                    self._update_cache_context(original_query=query, enhanced_query=enhanced_query)
                 return enhanced_query
 
+            if self._advanced_cache_active():
+                self._update_cache_context(original_query=query, enhanced_query=final_enhanced_query)
             return final_enhanced_query
 
+        if self._advanced_cache_active():
+            self._update_cache_context(original_query=query, enhanced_query=enhanced_query)
         return enhanced_query
 
     def _classify_study_type(

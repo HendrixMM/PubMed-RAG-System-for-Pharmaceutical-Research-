@@ -6,7 +6,9 @@ import logging
 import os
 import threading
 import time
-from typing import Any, Awaitable, TypedDict
+from typing import Any
+from typing import Awaitable
+from typing import TypedDict
 
 from langchain_core.documents import Document
 
@@ -14,8 +16,13 @@ from .ddi_pk_processor import DDIPKProcessor
 from .enhanced_config import EnhancedRAGConfig
 from .enhanced_pubmed_agent import PubMedIntegrationManager
 from .medical_guardrails import MedicalGuardrails
-from .rag_agent import RAGAgent, RAGResponse
+from .pubmed_scraper import PubMedScraper
+from .rag_agent import RAGAgent
+from .rag_agent import RAGResponse
 from .synthesis_engine import SynthesisEngine
+
+# Back-compat alias for older tests/imports
+DDIProcessor = DDIPKProcessor
 
 try:
     from guardrails.actions import contains_medical_disclaimer
@@ -124,7 +131,7 @@ class EnhancedRAGAgent:
         default_safe: bool = False,
         config: EnhancedRAGConfig | None = None,
         pubmed_query_engine: EnhancedQueryEngine | None = None,
-        pubmed_scraper: EnhancedPubMedScraper | None = None,
+        pubmed_scraper: PubMedScraper | None = None,
         # NeMo extraction integration (optional; passed through to base agent)
         enable_nemo_extraction: bool | None = None,
         nemo_extraction_config: dict | None = None,
@@ -246,7 +253,7 @@ class EnhancedRAGAgent:
         self._components_initialized = False
 
     @property
-    def pubmed_scraper(self) -> EnhancedPubMedScraper | None:
+    def pubmed_scraper(self) -> PubMedScraper | None:
         """Get the PubMed scraper instance. Read-only access."""
         return self._pubmed_integration.pubmed_scraper
 
@@ -257,7 +264,7 @@ class EnhancedRAGAgent:
 
     # Backward compatibility aliases for deprecated private attributes
     @property
-    def _pubmed_scraper(self) -> EnhancedPubMedScraper | None:
+    def _pubmed_scraper(self) -> PubMedScraper | None:
         """Deprecated: Use pubmed_scraper property instead."""
         return self._pubmed_integration.pubmed_scraper
 

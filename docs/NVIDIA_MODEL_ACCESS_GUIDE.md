@@ -207,7 +207,7 @@ client = OpenAIWrapper(config)  # No NGC dependencies
 - Docker services don't require NGC registry
 - Can use custom images or third-party registries
 - `docker-compose.yml` configured for NGC independence
-- See: [docker-compose.yml](../docker-compose.yml) header documentation
+- See: [`docker-compose.yml`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/docker-compose.yml) header documentation
 
 ### 📊 Benefits of Early NGC Independence
 

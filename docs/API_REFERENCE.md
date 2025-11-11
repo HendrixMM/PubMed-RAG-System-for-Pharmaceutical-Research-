@@ -49,6 +49,7 @@ Review Cadence: Bi-weekly
 This comprehensive API reference provides detailed configuration options, code examples, and edge case handling for the NVIDIA NeMoRetriever RAG Template. The system is built with a cloud-first architecture using NVIDIA Build platform with NGC deprecation immunity.
 
 **Key Features:**
+
 - NGC-independent architecture (immune to March 2026 deprecation)
 - Free tier: 10,000 requests/month
 - OpenAI SDK compatibility
@@ -59,16 +60,17 @@ This comprehensive API reference provides detailed configuration options, code e
 
 ### Core Configuration
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `NVIDIA_API_KEY` | string | - | NVIDIA Build API key (format: `nvapi-...`) | ✅ Yes |
-| `APP_ENV` | string | `development` | Application environment (`development` \| `production`) | No |
-| `DOCS_FOLDER` | string | `Data/Docs` | Directory containing documents to index | No |
-| `VECTOR_DB_PATH` | string | `./vector_db` | Path to vector database storage | No |
-| `CHUNK_SIZE` | integer | `1000` | Size of document chunks in characters | No |
-| `CHUNK_OVERLAP` | integer | `200` | Overlap between chunks in characters | No |
+| Variable         | Type    | Default       | Description                                             | Required |
+| ---------------- | ------- | ------------- | ------------------------------------------------------- | -------- |
+| `NVIDIA_API_KEY` | string  | -             | NVIDIA Build API key (format: `nvapi-...`)              | ✅ Yes   |
+| `APP_ENV`        | string  | `development` | Application environment (`development` \| `production`) | No       |
+| `DOCS_FOLDER`    | string  | `Data/Docs`   | Directory containing documents to index                 | No       |
+| `VECTOR_DB_PATH` | string  | `./vector_db` | Path to vector database storage                         | No       |
+| `CHUNK_SIZE`     | integer | `1000`        | Size of document chunks in characters                   | No       |
+| `CHUNK_OVERLAP`  | integer | `200`         | Overlap between chunks in characters                    | No       |
 
 **Example:**
+
 ```bash
 export NVIDIA_API_KEY="nvapi-your-key-here"
 export APP_ENV="production"
@@ -77,14 +79,15 @@ export DOCS_FOLDER="/path/to/pharmaceutical/docs"
 
 ### NVIDIA API Configuration
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `NVIDIA_BUILD_BASE_URL` | string | `https://integrate.api.nvidia.com/v1` | NVIDIA Build API endpoint | No |
-| `EMBEDDING_BASE_URL` | string | (uses NVIDIA_BUILD_BASE_URL) | Override for embedding endpoint | No |
-| `NEMO_RERANKING_ENDPOINT` | string | - | Self-hosted reranking endpoint | No |
-| `NEMO_EXTRACTION_ENDPOINT` | string | - | Self-hosted extraction endpoint | No |
+| Variable                   | Type   | Default                               | Description                     | Required |
+| -------------------------- | ------ | ------------------------------------- | ------------------------------- | -------- |
+| `NVIDIA_BUILD_BASE_URL`    | string | `https://integrate.api.nvidia.com/v1` | NVIDIA Build API endpoint       | No       |
+| `EMBEDDING_BASE_URL`       | string | (uses NVIDIA_BUILD_BASE_URL)          | Override for embedding endpoint | No       |
+| `NEMO_RERANKING_ENDPOINT`  | string | -                                     | Self-hosted reranking endpoint  | No       |
+| `NEMO_EXTRACTION_ENDPOINT` | string | -                                     | Self-hosted extraction endpoint | No       |
 
 **Cloud-First Architecture:**
+
 ```bash
 # Default: NVIDIA Build (cloud, NGC-independent)
 NVIDIA_BUILD_BASE_URL=https://integrate.api.nvidia.com/v1
@@ -96,55 +99,82 @@ NEMO_RERANKING_ENDPOINT=http://localhost:8001/v1
 
 ### Model Selection
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `EMBEDDING_MODEL` | string | `nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1` | Primary embedding model | No |
-| `EMBEDDING_FALLBACK_MODEL` | string | `nvidia/nv-embed-v1` | Fallback if primary unavailable | No |
-| `RERANK_MODEL` | string | `llama-3_2-nemoretriever-500m-rerank-v2` | Reranking model | No |
-| `LLM_MODEL_NAME` | string | `meta/llama-3.1-8b-instruct` | LLM for generation | No |
+| Variable                   | Type   | Default                                          | Description                     | Required |
+| -------------------------- | ------ | ------------------------------------------------ | ------------------------------- | -------- |
+| `EMBEDDING_MODEL`          | string | `nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1` | Primary embedding model         | No       |
+| `EMBEDDING_FALLBACK_MODEL` | string | `nvidia/nv-embed-v1`                             | Fallback if primary unavailable | No       |
+| `RERANK_MODEL`             | string | `llama-3_2-nemoretriever-500m-rerank-v2`         | Reranking model                 | No       |
+| `LLM_MODEL_NAME`           | string | `meta/llama-3.1-8b-instruct`                     | LLM for generation              | No       |
 
 **Model Dimensions:**
+
 - `llama-3.2-nemoretriever-1b-vlm-embed-v1`: **1024 dimensions**
 - `nvidia/nv-embed-v1`: **4096 dimensions**
 
 **Critical:** Switching models requires reindexing due to dimension differences.
 
+### Advanced Embedding Configuration
+
+| Variable                          | Type    | Default | Description                                                       | Required |
+| --------------------------------- | ------- | ------- | ----------------------------------------------------------------- | -------- |
+| `EMBEDDING_INPUT_TYPE_ENABLED`    | boolean | `false` | Enable `input_type` payload differentiation (queries vs passages) | No       |
+| `EMBEDDING_PROBE_TIMEOUT_SECONDS` | integer | `30`    | Timeout for model availability probe during initialization        | No       |
+| `EMBEDDING_TIMEOUT_SECONDS`       | integer | `60`    | Timeout for embedding API requests                                | No       |
+
+**EMBEDDING_INPUT_TYPE_ENABLED Details:**
+When enabled, the embedding client sends `input_type: "query"` for query embeddings and `input_type: "passage"` for document embeddings. This improves accuracy for NeMo Retriever models (e.g., `llama-3.2-nemoretriever-1b-vlm-embed-v1`) but may cause errors with nv-embed models that don't support this parameter.
+
+**Timeout Configuration:**
+
+```bash
+# Increase timeouts for slow networks or large batches
+export EMBEDDING_PROBE_TIMEOUT_SECONDS=60  # Probe timeout
+export EMBEDDING_TIMEOUT_SECONDS=120       # Request timeout
+```
+
+**Effects:**
+
+- **Probe timeout**: Affects startup time when checking model availability. Increase for unreliable networks.
+- **Request timeout**: Affects batch processing latency. Increase for large `EMBEDDING_BATCH_SIZE` values (>50).
+
 ### PubMed Integration
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `PUBMED_EMAIL` | string | - | Contact email (NCBI identification) | Recommended |
-| `PUBMED_EUTILS_API_KEY` | string | - | NCBI API key for increased rate limits | No |
-| `PUBMED_CACHE_DIR` | string | `./pubmed_cache` | PubMed response cache directory | No |
-| `NCBI_CACHE_TTL_HOURS` | integer | `24` | Cache TTL (NCBI requires ≥24 hours) | No |
-| `DEFAULT_MAX_ITEMS` | integer | `30` | Default max results per query | No |
-| `ENABLE_DEDUPLICATION` | boolean | `true` | Deduplicate by DOI/PMID | No |
+| Variable                | Type    | Default          | Description                            | Required    |
+| ----------------------- | ------- | ---------------- | -------------------------------------- | ----------- |
+| `PUBMED_EMAIL`          | string  | -                | Contact email (NCBI identification)    | Recommended |
+| `PUBMED_EUTILS_API_KEY` | string  | -                | NCBI API key for increased rate limits | No          |
+| `PUBMED_CACHE_DIR`      | string  | `./pubmed_cache` | PubMed response cache directory        | No          |
+| `NCBI_CACHE_TTL_HOURS`  | integer | `24`             | Cache TTL (NCBI requires ≥24 hours)    | No          |
+| `DEFAULT_MAX_ITEMS`     | integer | `30`             | Default max results per query          | No          |
+| `ENABLE_DEDUPLICATION`  | boolean | `true`           | Deduplicate by DOI/PMID                | No          |
 
 **Rate Limits:**
+
 - Without API key: **3 requests/second**
 - With API key: **10 requests/second**
 
 ### Pharmaceutical Features
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `PHARMACEUTICAL_RESEARCH_MODE` | boolean | `false` | Enable pharmaceutical features | No |
-| `PHARMA_DOMAIN_OVERLAY` | boolean | `true` | Enable drug interaction detection | No |
-| `ENABLE_MEDICAL_GUARDRAILS` | boolean | `true` | Enable safety guardrails | No |
-| `NEMO_PHARMACEUTICAL_ANALYSIS` | boolean | `true` | Extract pharmaceutical metadata | No |
-| `ENABLE_PHARMA_QUERY_ENHANCEMENT` | boolean | `true` | Expand queries with pharma terms | No |
-| `PHARMA_MAX_TERMS` | integer | `8` | Max enhancement terms | No |
+| Variable                          | Type    | Default | Description                       | Required |
+| --------------------------------- | ------- | ------- | --------------------------------- | -------- |
+| `PHARMACEUTICAL_RESEARCH_MODE`    | boolean | `false` | Enable pharmaceutical features    | No       |
+| `PHARMA_DOMAIN_OVERLAY`           | boolean | `true`  | Enable drug interaction detection | No       |
+| `ENABLE_MEDICAL_GUARDRAILS`       | boolean | `true`  | Enable safety guardrails          | No       |
+| `NEMO_PHARMACEUTICAL_ANALYSIS`    | boolean | `true`  | Extract pharmaceutical metadata   | No       |
+| `ENABLE_PHARMA_QUERY_ENHANCEMENT` | boolean | `true`  | Expand queries with pharma terms  | No       |
+| `PHARMA_MAX_TERMS`                | integer | `8`     | Max enhancement terms             | No       |
 
 ### Vector Database
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `VECTOR_DB_PER_MODEL` | boolean | `false` | Separate indexes per model | No |
-| `FAISS_INDEX_TYPE` | string | `Flat` | FAISS index type | No |
-| `ENABLE_VECTOR_DB_STATS` | boolean | `true` | Track vector DB statistics | No |
+| Variable                 | Type    | Default | Description                | Required |
+| ------------------------ | ------- | ------- | -------------------------- | -------- |
+| `VECTOR_DB_PER_MODEL`    | boolean | `false` | Separate indexes per model | No       |
+| `FAISS_INDEX_TYPE`       | string  | `Flat`  | FAISS index type           | No       |
+| `ENABLE_VECTOR_DB_STATS` | boolean | `true`  | Track vector DB statistics | No       |
 
 **VECTOR_DB_PER_MODEL Explanation:**
 When `true`, creates separate vector stores for each embedding model to prevent dimension mismatches:
+
 ```
 vector_db/
 ├── llama-3.2-nemoretriever-1b-vlm-embed-v1/  # 1024-dim
@@ -153,21 +183,21 @@ vector_db/
 
 ### Rate Limiting & Performance
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `ENABLE_RATE_LIMITING` | boolean | `true` | Enable rate limiting | No |
-| `MAX_REQUESTS_PER_SECOND` | float | `3.0` | Max requests/second | No |
-| `DAILY_REQUEST_LIMIT` | integer | `10000` | Daily request cap (free tier) | No |
-| `EMBEDDING_BATCH_SIZE` | integer | `10` | Batch size for embeddings | No |
-| `ENABLE_ADVANCED_CACHING` | boolean | `true` | Enable query caching | No |
+| Variable                  | Type    | Default | Description                   | Required |
+| ------------------------- | ------- | ------- | ----------------------------- | -------- |
+| `ENABLE_RATE_LIMITING`    | boolean | `true`  | Enable rate limiting          | No       |
+| `MAX_REQUESTS_PER_SECOND` | float   | `3.0`   | Max requests/second           | No       |
+| `DAILY_REQUEST_LIMIT`     | integer | `10000` | Daily request cap (free tier) | No       |
+| `EMBEDDING_BATCH_SIZE`    | integer | `10`    | Batch size for embeddings     | No       |
+| `ENABLE_ADVANCED_CACHING` | boolean | `true`  | Enable query caching          | No       |
 
 ### Monitoring & Cost Tracking
 
-| Variable | Type | Default | Description | Required |
-|----------|------|---------|-------------|----------|
-| `NVIDIA_CREDITS_MONITORING` | boolean | `true` | Track NVIDIA Build usage | No |
-| `PHARMA_BUDGET_LIMIT_USD` | float | - | Monthly budget limit | No |
-| `ENABLE_DEBUG_LOGGING` | boolean | `false` | Enable debug logs | No |
+| Variable                    | Type    | Default | Description              | Required |
+| --------------------------- | ------- | ------- | ------------------------ | -------- |
+| `NVIDIA_CREDITS_MONITORING` | boolean | `true`  | Track NVIDIA Build usage | No       |
+| `PHARMA_BUDGET_LIMIT_USD`   | float   | -       | Monthly budget limit     | No       |
+| `ENABLE_DEBUG_LOGGING`      | boolean | `false` | Enable debug logs        | No       |
 
 ## Python API Examples
 
@@ -345,6 +375,7 @@ curl -X POST https://integrate.api.nvidia.com/v1/embeddings \
 ```
 
 **Expected Response:**
+
 ```json
 {
   "object": "list",
@@ -368,20 +399,39 @@ curl -X POST https://integrate.api.nvidia.com/v1/embeddings \
 **Rerank Retrieved Documents:**
 
 ```bash
-curl -X POST https://integrate.api.nvidia.com/v1/ranking \
+curl -X POST https://integrate.api.nvidia.com/v1/rerank \
   -H "Authorization: Bearer nvapi-your-key-here" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "llama-3_2-nemoretriever-500m-rerank-v2",
-    "query": {"text": "drug interactions warfarin"},
+    "model": "nvidia/llama-3_2-nemoretriever-500m-rerank-v2",
+    "query": "drug interactions warfarin",
     "passages": [
-      {"text": "Warfarin interacts with aspirin..."},
-      {"text": "Aspirin is an NSAID medication..."}
-    ]
+      "Warfarin interacts with aspirin...",
+      "Aspirin is an NSAID medication..."
+    ],
+    "top_n": 2
+  }'
+```
+
+**Object Payload Variant (`documents` array):**
+
+```bash
+curl -X POST https://integrate.api.nvidia.com/v1/rerank \
+  -H "Authorization: Bearer nvapi-your-key-here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "nvidia/llama-3_2-nemoretriever-500m-rerank-v2",
+    "query": "drug interactions warfarin",
+    "documents": [
+      {"text": "Warfarin interacts with aspirin...", "id": "pubmed:123"},
+      {"text": "Aspirin is an NSAID medication...", "metadata": {"source": "local_corpus"}}
+    ],
+    "top_n": 2
   }'
 ```
 
 **Expected Response:**
+
 ```json
 {
   "rankings": [
@@ -399,6 +449,10 @@ curl -X POST https://integrate.api.nvidia.com/v1/ranking \
 }
 ```
 
+`OpenAIWrapper.rerank` automatically cycles through both payload styles (`passages` string array and `documents` object array) to maximize compatibility with NVIDIA Build and self-hosted NeMo endpoints. The examples above use the current default model (`nvidia/llama-3_2-nemoretriever-500m-rerank-v2`) and mirror the behavior exercised by `scripts/nvidia_build_rerank_test.py`.
+
+**Alternate NeMo Endpoint:** To route directly to NeMo Retrieval (instead of NVIDIA Build), call `https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking` with the same payload and set `ENABLE_CLOUD_FIRST_RERANK=false` or export `ENABLE_NVB_RERANK=false`. Self-hosted NeMo deployments expect the `nvidia/…` namespace without any remapping.
+
 ## Edge Cases & Error Handling
 
 ### Edge Case 1: Missing API Key
@@ -406,13 +460,15 @@ curl -X POST https://integrate.api.nvidia.com/v1/ranking \
 **Problem:** NVIDIA_API_KEY environment variable not set
 
 **Python Error:**
+
 ```python
 ValueError: NVIDIA API key is required. Set NVIDIA_API_KEY environment variable.
 ```
 
-**Code Location:** [src/nvidia_embeddings.py:112](../src/nvidia_embeddings.py#L112)
+**Code Location:** `NVIDIAEmbeddings.__init__` (API key validation)
 
 **Solution:**
+
 ```bash
 # Set environment variable
 export NVIDIA_API_KEY="nvapi-your-key-here"
@@ -422,6 +478,7 @@ embeddings = NVIDIAEmbeddings(api_key="nvapi-your-key-here")
 ```
 
 **cURL Equivalent:**
+
 ```bash
 # HTTP 401 Unauthorized
 curl -X POST https://integrate.api.nvidia.com/v1/embeddings \
@@ -437,9 +494,10 @@ curl -X POST https://integrate.api.nvidia.com/v1/embeddings \
 
 **HTTP Response:** `401 Unauthorized` or `403 Forbidden`
 
-**Code Location:** [src/nvidia_embeddings.py:428-430](../src/nvidia_embeddings.py#L428)
+**Code Location:** `NVIDIAEmbeddings._probe_and_set_model` / `_make_request` authentication branch
 
 **Error Handling:**
+
 ```python
 # Automatic retry with exponential backoff
 try:
@@ -451,6 +509,7 @@ except requests.exceptions.HTTPError as e:
 ```
 
 **Solution:**
+
 1. Verify API key at https://build.nvidia.com
 2. Regenerate if expired
 3. Check key format: must start with `nvapi-`
@@ -461,9 +520,10 @@ except requests.exceptions.HTTPError as e:
 
 **HTTP Response:** `429 Too Many Requests`
 
-**Code Location:** [src/nvidia_embeddings.py:432-434](../src/nvidia_embeddings.py#L432)
+**Code Location:** `NVIDIAEmbeddings._make_request` rate-limit handling
 
 **Automatic Handling:**
+
 ```python
 # Built-in exponential backoff with jitter
 # Retries: wait 1s, 2s, 4s, 8s...
@@ -474,6 +534,7 @@ embeddings = NVIDIAEmbeddings(
 ```
 
 **Manual Rate Limiting:**
+
 ```bash
 # Enable rate limiting in .env
 ENABLE_RATE_LIMITING=true
@@ -482,6 +543,7 @@ DAILY_REQUEST_LIMIT=10000
 ```
 
 **Solution:**
+
 1. Enable `ENABLE_RATE_LIMITING=true`
 2. Reduce `EMBEDDING_BATCH_SIZE`
 3. Implement request queuing
@@ -492,13 +554,15 @@ DAILY_REQUEST_LIMIT=10000
 **Problem:** Requested model not available on NVIDIA Build
 
 **Error Indicators:**
+
 - `"unknown model"`
 - `"model not found"`
 - `"not available"`
 
-**Code Location:** [src/nvidia_embeddings.py:337-400](../src/nvidia_embeddings.py#L337)
+**Code Location:** `NVIDIAEmbeddings._extract_model_unavailable_reason` + `_probe_and_set_model`
 
 **Automatic Fallback:**
+
 ```python
 # Automatically falls back to nv-embed-v1
 embeddings = NVIDIAEmbeddings(
@@ -512,6 +576,7 @@ print(f"Reason: {embeddings.model_selection_reason}")
 ```
 
 **Configuration:**
+
 ```bash
 # Configure fallback in .env
 EMBEDDING_MODEL=nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1
@@ -523,21 +588,25 @@ EMBEDDING_FALLBACK_MODEL=nvidia/nv-embed-v1
 **Problem:** Switching models with different dimensions causes vector DB errors
 
 **Models:**
+
 - `llama-3.2-nemoretriever`: **1024 dimensions**
 - `nv-embed-v1`: **4096 dimensions**
 
 **Error:**
+
 ```
 RuntimeError: Vector dimension mismatch: expected 1024, got 4096
 ```
 
 **Solution 1: Per-Model Vector Stores**
+
 ```bash
 # Enable separate indexes per model
 VECTOR_DB_PER_MODEL=true
 ```
 
 **Solution 2: Reindex Corpus**
+
 ```python
 # Clear existing index and reindex with new model
 from src.vector_database import VectorDatabase
@@ -556,15 +625,18 @@ vector_db.add_documents(documents)
 **Problem:** NCBI E-utilities rate limits exceeded
 
 **Rate Limits:**
+
 - Without API key: **3 requests/second**
 - With API key: **10 requests/second**
 
 **Error:**
+
 ```
 HTTP 429: Too Many Requests (NCBI E-utilities)
 ```
 
 **Solution:**
+
 ```bash
 # Set contact email (recommended by NCBI)
 PUBMED_EMAIL=researcher@example.com
@@ -584,6 +656,7 @@ MAX_REQUESTS_PER_SECOND=2.5  # Stay under 3 req/s limit
 **NCBI Policy:** https://www.ncbi.nlm.nih.gov/books/NBK25497/
 
 **Configuration:**
+
 ```bash
 # Minimum 24 hours (NCBI compliance)
 NCBI_CACHE_TTL_HOURS=24
@@ -594,6 +667,7 @@ CACHE_GRACE_PERIOD_HOURS=2
 ```
 
 **Handling Stale Cache:**
+
 ```python
 from src.pubmed_scraper import PubMedScraper
 
@@ -613,6 +687,7 @@ results = scraper.search("drug interactions")
 **Problem:** Exceeded NVIDIA Build free tier (10,000 requests/month)
 
 **Monitoring:**
+
 ```bash
 # Enable credit tracking
 NVIDIA_CREDITS_MONITORING=true
@@ -622,6 +697,7 @@ PHARMA_BUDGET_LIMIT_USD=10.00
 ```
 
 **Check Usage:**
+
 ```python
 from src.monitoring.credit_tracker import CreditTracker
 
@@ -634,18 +710,22 @@ print(f"Reset date: {usage['reset_date']}")
 ```
 
 **Optimization Strategies:**
+
 1. **Enable Batch Processing:**
+
    ```bash
    EMBEDDING_BATCH_SIZE=20  # Increase batch size
    ```
 
 2. **Enable Caching:**
+
    ```bash
    ENABLE_ADVANCED_CACHING=true
    CACHE_QUERY_RESULTS=true
    ```
 
 3. **Reduce Query Frequency:**
+
    ```bash
    DAILY_REQUEST_LIMIT=300  # ~10k/month ÷ 30 days
    ```
@@ -656,14 +736,33 @@ print(f"Reset date: {usage['reset_date']}")
    NEMO_EMBEDDING_ENDPOINT=http://localhost:8000/v1
    ```
 
+**Reranking Implementation Validation:**
+
+The reranking cURL examples in this document have been validated against the production implementation:
+
+- Endpoint paths verified in `src/clients/openai_wrapper.py:1186`
+- Payload schemas (string arrays and object arrays) tested in `src/clients/openai_wrapper.py:1281-1291`
+- Model mappings validated in `src/clients/openai_wrapper.py:1234-1251`
+- Working test script available: `scripts/nvidia_build_rerank_test.py`
+
+To test reranking locally:
+
+```bash
+python scripts/nvidia_build_rerank_test.py
+```
+
+Expected output includes rankings with `index`, `logit`, and `score` fields for each candidate passage.
+
 ## CLI Command Reference
 
 **Test API Connectivity:**
+
 ```bash
 python scripts/nvidia_build_api_test.py
 ```
 
 **Run Pharmaceutical Benchmarks:**
+
 ```bash
 # All categories
 python scripts/run_pharmaceutical_benchmarks.py
@@ -679,21 +778,25 @@ python scripts/run_pharmaceutical_benchmarks.py --simulate
 ```
 
 **Validate Environment:**
+
 ```bash
 python scripts/validate_env.py
 ```
 
 **Launch CLI Interface:**
+
 ```bash
 python main.py --mode cli
 ```
 
 **Launch Web Interface:**
+
 ```bash
 streamlit run streamlit_app.py
 ```
 
 **Monitor Performance:**
+
 ```bash
 python scripts/performance_monitor.py
 ```
@@ -701,6 +804,7 @@ python scripts/performance_monitor.py
 ## API Response Formats
 
 **Embedding Response:**
+
 ```json
 {
   "object": "list",
@@ -720,6 +824,7 @@ python scripts/performance_monitor.py
 ```
 
 **Reranking Response:**
+
 ```json
 {
   "rankings": [
@@ -739,6 +844,7 @@ python scripts/performance_monitor.py
 ```
 
 **RAG Response (with Pharmaceutical Metadata):**
+
 ```python
 {
     "answer": "Warfarin and aspirin can interact...",
@@ -764,12 +870,13 @@ python scripts/performance_monitor.py
 
 ### NVIDIA Build Platform
 
-| Tier | Requests/Month | Cost |
-|------|----------------|------|
-| Free | 10,000 | $0 |
-| Paid | Custom | Variable |
+| Tier | Requests/Month | Cost     |
+| ---- | -------------- | -------- |
+| Free | 10,000         | $0       |
+| Paid | Custom         | Variable |
 
 **Daily Breakdown (Free Tier):**
+
 - ~333 requests/day
 - ~14 requests/hour
 - Monitor with: `NVIDIA_CREDITS_MONITORING=true`
@@ -777,9 +884,9 @@ python scripts/performance_monitor.py
 ### PubMed E-utilities
 
 | Configuration | Requests/Second |
-|---------------|-----------------|
-| No API key | 3 |
-| With API key | 10 |
+| ------------- | --------------- |
+| No API key    | 3               |
+| With API key  | 10              |
 
 **Get API Key:** https://www.ncbi.nlm.nih.gov/account/
 
@@ -788,43 +895,48 @@ python scripts/performance_monitor.py
 **Cost:** $0.25 per 1000 compute units
 
 **Budget Tracking:**
+
 ```bash
 MONTHLY_BUDGET_LIMIT=19.99
 ```
 
 ## Troubleshooting Quick Reference
 
-| Symptom | Likely Cause | Solution |
-|---------|--------------|----------|
-| `ValueError: NVIDIA API key is required` | Missing API key | Set `NVIDIA_API_KEY` |
-| HTTP 401/403 | Invalid API key | Verify at build.nvidia.com |
-| HTTP 429 | Rate limiting | Enable `ENABLE_RATE_LIMITING=true` |
-| `unknown model` error | Model unavailable | Check fallback configuration |
-| Vector dimension mismatch | Model switch | Enable `VECTOR_DB_PER_MODEL=true` |
-| Slow PubMed queries | No API key | Set `PUBMED_EUTILS_API_KEY` |
-| Cache errors | Expired cache | Check `NCBI_CACHE_TTL_HOURS` |
-| Free tier exhausted | Over 10k requests/month | Enable caching or upgrade |
+| Symptom                                  | Likely Cause            | Solution                           |
+| ---------------------------------------- | ----------------------- | ---------------------------------- |
+| `ValueError: NVIDIA API key is required` | Missing API key         | Set `NVIDIA_API_KEY`               |
+| HTTP 401/403                             | Invalid API key         | Verify at build.nvidia.com         |
+| HTTP 429                                 | Rate limiting           | Enable `ENABLE_RATE_LIMITING=true` |
+| `unknown model` error                    | Model unavailable       | Check fallback configuration       |
+| Vector dimension mismatch                | Model switch            | Enable `VECTOR_DB_PER_MODEL=true`  |
+| Slow PubMed queries                      | No API key              | Set `PUBMED_EUTILS_API_KEY`        |
+| Cache errors                             | Expired cache           | Check `NCBI_CACHE_TTL_HOURS`       |
+| Free tier exhausted                      | Over 10k requests/month | Enable caching or upgrade          |
 
 **For detailed troubleshooting:** [docs/TROUBLESHOOTING_GUIDE.md](TROUBLESHOOTING_GUIDE.md)
 
 ## Cross-References
 
 ### Architecture & Design
+
 - [ADR-0001: Adopt NVIDIA NeMo Retriever](adr/0001-use-nemo-retriever.md) - Decision rationale
 - [Architecture Documentation](ARCHITECTURE.md) - System architecture
 - [NGC Deprecation Immunity](NGC_DEPRECATION_IMMUNITY.md) - NGC independence
 
 ### Integration Guides
+
 - [API Integration Guide](API_INTEGRATION_GUIDE.md) - Advanced patterns
 - [Examples](EXAMPLES.md) - Code examples
 - [Features](FEATURES.md) - Feature documentation
 
 ### Operations
+
 - [Free Tier Maximization](FREE_TIER_MAXIMIZATION.md) - Cost optimization
 - [Cheapest Deployment](CHEAPEST_DEPLOYMENT.md) - Budget deployment
 - [Troubleshooting Guide](TROUBLESHOOTING_GUIDE.md) - Detailed diagnostics
 
 ### Pharmaceutical Domain
+
 - [Pharmaceutical Best Practices](PHARMACEUTICAL_BEST_PRACTICES.md) - Domain guidelines
 - [Benchmarks](BENCHMARKS.md) - Performance benchmarks
 

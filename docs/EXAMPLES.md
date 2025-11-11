@@ -28,9 +28,16 @@ A comprehensive collection of runnable code examples demonstrating all major fea
 
 ## Quick Start Examples
 
+> **Prerequisites**
+>
+> - Install base dependencies (`pip install -r requirements.txt`)
+> - Export `NVIDIA_API_KEY` (and optional `PUBMED_EUTILS_API_KEY` for PubMed demos)
+> - Run commands from the repository root so `main.py` and `streamlit_app.py` can import `src.*`
+
 ### CLI Usage
 
 **Prerequisites:**
+
 ```bash
 # Set API key
 export NVIDIA_API_KEY="nvapi-your-key-here"
@@ -40,6 +47,7 @@ pip install -r requirements.txt
 ```
 
 **Basic Query:**
+
 ```bash
 # Launch CLI interface
 python main.py --mode cli
@@ -56,6 +64,7 @@ python main.py --mode cli
 ### Web Interface
 
 **Launch Streamlit:**
+
 ```bash
 streamlit run streamlit_app.py
 
@@ -83,13 +92,21 @@ print(response.answer)
 
 ## Basic Usage
 
+> **Prerequisites**
+>
+> - Modules used: `src.document_loader`, `src.nvidia_embeddings`, `src.vector_database`, `src.enhanced_rag_agent`
+> - Export `NVIDIA_API_KEY` and create a writable vector DB path such as `./vector_db`
+> - Populate `Data/Docs/` with sample content for ingestion
+
 ### Example 1: Document Loading and Indexing
 
 **Prerequisites:**
+
 - Documents in `Data/Docs/` directory
 - NVIDIA_API_KEY set
 
 **Complete Code:**
+
 ```python
 from src.document_loader import DocumentLoader
 from src.nvidia_embeddings import NVIDIAEmbeddings
@@ -132,6 +149,7 @@ print("✅ Vector database saved")
 ```
 
 **Variations:**
+
 ```python
 # Load specific file types
 loader = DocumentLoader(
@@ -150,6 +168,7 @@ vector_db = VectorDatabase(
 ### Example 2: Basic Query and Answer
 
 **Complete Code:**
+
 ```python
 from src.enhanced_rag_agent import EnhancedRAGAgent
 
@@ -190,6 +209,7 @@ for i, source in enumerate(response.sources, 1):
 ```
 
 **Expected Output:**
+
 ```
 Source 1:
   Title: Pharmacokinetics of Warfarin in Clinical Practice
@@ -204,9 +224,16 @@ Source 2:
 
 ## Pharmaceutical Examples
 
+> **Prerequisites**
+>
+> - Modules used: `src.pharmaceutical_query_adapter`, `src.query_engine`, `src.pharmaceutical.safety_alert_integration`
+> - Environment flags: `PHARMACEUTICAL_RESEARCH_MODE=true`, `PHARMA_DOMAIN_OVERLAY=true`, `NVIDIA_API_KEY`
+> - Guardrails data available under `guardrails/` for safety alert demonstrations
+
 ### Example 1: Drug Interaction Query
 
 **Prerequisites:**
+
 ```bash
 # Enable pharmaceutical mode
 export PHARMACEUTICAL_RESEARCH_MODE=true
@@ -214,6 +241,7 @@ export PHARMA_DOMAIN_OVERLAY=true
 ```
 
 **Complete Code:**
+
 ```python
 from src.pharmaceutical_query_adapter import build_pharmaceutical_query_engine
 
@@ -251,6 +279,7 @@ for i, result in enumerate(results[:3], 1):
 ```
 
 **Expected Output:**
+
 ```
 ✅ Pharmaceutical query engine initialized
 
@@ -275,6 +304,7 @@ Excerpt: Warfarin and aspirin interact through complementary mechanisms affectin
 ### Example 2: Species-Specific Search
 
 **Complete Code:**
+
 ```python
 from src.query_engine import QueryEngine
 
@@ -302,6 +332,7 @@ for species, count in sorted(species_counts.items()):
 ```
 
 **Expected Output:**
+
 ```
 Found 10 human studies
 
@@ -310,6 +341,7 @@ Species distribution:
 ```
 
 **Other Species Filters:**
+
 ```python
 # Mouse studies
 results = engine.search(query="...", species_filter="mouse")
@@ -324,6 +356,7 @@ results = engine.search(query="...", species_filter="human,mouse")
 ### Example 3: Clinical Study Filtering
 
 **Complete Code:**
+
 ```python
 from src.query_engine import QueryEngine
 
@@ -354,6 +387,7 @@ for result in results[:3]:
 ```
 
 **Expected Output:**
+
 ```
 Found 15 Phase 3 trials
 
@@ -373,12 +407,14 @@ Study type: clinical_trial
 ### Example 4: Safety Alert Integration
 
 **Prerequisites:**
+
 ```bash
 # Ensure guardrails are configured
 ls guardrails/kb/  # Check for safety keyword files
 ```
 
 **Complete Code:**
+
 ```python
 from src.pharmaceutical.safety_alert_integration import SafetyAlertIntegration
 
@@ -407,6 +443,7 @@ for i, alert in enumerate(alerts, 1):
 ```
 
 **Expected Output:**
+
 ```
 ✅ Safety alert system initialized
 
@@ -428,9 +465,17 @@ Alert 2:
 
 ## PubMed Integration
 
+> **Prerequisites**
+>
+> - Module used: `src.pubmed_scraper`
+> - Export `PUBMED_EMAIL` (required by NCBI) and optional `PUBMED_EUTILS_API_KEY` for higher limits
+> - Ensure `./pubmed_cache/` is writable for caching and metadata sidecars
+> - Advanced caching + rate limiting are controlled via `ENABLE_ADVANCED_CACHING` and `ENABLE_RATE_LIMITING`; the unified `PubMedScraper` respects both without separate classes
+
 ### Example 1: Basic PubMed Scraping
 
 **Prerequisites:**
+
 ```bash
 # Recommended: Set contact email (NCBI policy)
 export PUBMED_EMAIL="researcher@example.com"
@@ -440,6 +485,7 @@ export PUBMED_EUTILS_API_KEY="your-ncbi-api-key"
 ```
 
 **Complete Code:**
+
 ```python
 from src.pubmed_scraper import PubMedScraper
 
@@ -470,6 +516,7 @@ for i, article in enumerate(results[:5], 1):
 ```
 
 **Expected Output:**
+
 ```
 ✅ PubMed scraper initialized
 
@@ -494,6 +541,7 @@ Abstract: The pharmacokinetic profile of warfarin makes it susceptible to drug i
 ### Example 2: PubMed with Caching
 
 **Complete Code:**
+
 ```python
 from src.pubmed_scraper import PubMedScraper
 import time
@@ -526,6 +574,7 @@ print(f"📁 Cache contains {len(cache_files)} files")
 ```
 
 **Expected Output:**
+
 ```
 First request: 20 results in 3.45s
 Second request: 20 results in 0.12s
@@ -537,6 +586,7 @@ Second request: 20 results in 0.12s
 ### Example 3: PubMed with Ranking
 
 **Complete Code:**
+
 ```python
 from src.pubmed_scraper import PubMedScraper
 
@@ -562,6 +612,7 @@ for i, article in enumerate(results[:5], 1):
 ```
 
 **Expected Output:**
+
 ```
 Found 50 articles (ranked)
 
@@ -582,6 +633,7 @@ Found 50 articles (ranked)
 ### Example 4: PubMed Metadata Extraction
 
 **Complete Code:**
+
 ```python
 from src.pubmed_scraper import PubMedScraper
 import json
@@ -615,6 +667,7 @@ for article in results[:2]:
 ```
 
 **Expected Output:**
+
 ```
 Results with metadata:
 
@@ -631,9 +684,16 @@ Publication types: Journal Article, Comparative Study
 
 ## Advanced RAG Patterns
 
+> **Prerequisites**
+>
+> - Modules used: `src.nvidia_embeddings`, `src.vector_database`, `src.nemo_reranking_service`, `src.optimization.batch_processor`, `src.cache_management`
+> - Export `NVIDIA_API_KEY` plus optional `ENABLE_ADVANCED_CACHING=true`, `NEMO_RERANKING_ENDPOINT` overrides
+> - Prepare vector DB directories such as `./vector_db`, `./vector_db_4096`, and `./query_cache`
+
 ### Example 1: Custom Embedding Configuration
 
 **Complete Code:**
+
 ```python
 from src.nvidia_embeddings import NVIDIAEmbeddings
 from src.vector_database import VectorDatabase
@@ -673,6 +733,7 @@ vector_db = VectorDatabase(
 ### Example 2: Reranking Strategy
 
 **Complete Code:**
+
 ```python
 from src.nemo_reranking_service import NeMoRerankingService
 from src.vector_database import VectorDatabase
@@ -707,6 +768,7 @@ for i, doc in enumerate(reranked, 1):
 ```
 
 **Expected Output:**
+
 ```
 Initial retrieval: 20 documents
 After reranking: 5 documents
@@ -722,6 +784,7 @@ After reranking: 5 documents
 ### Example 3: Batch Processing
 
 **Complete Code:**
+
 ```python
 from src.optimization.batch_processor import BatchProcessor
 from src.nvidia_embeddings import NVIDIAEmbeddings
@@ -752,6 +815,7 @@ print(f"📊 Throughput: {processor.throughput:.1f} queries/second")
 ```
 
 **Expected Output:**
+
 ```
 Processing 54 queries in batches...
 ✅ Processed 54 queries
@@ -762,6 +826,7 @@ Processing 54 queries in batches...
 ### Example 4: Caching Strategy
 
 **Complete Code:**
+
 ```python
 from src.cache_management import CacheManager
 from src.enhanced_rag_agent import EnhancedRAGAgent
@@ -803,6 +868,7 @@ print(f"  Size: {stats['size_mb']:.2f} MB")
 ```
 
 **Expected Output:**
+
 ```
 ✅ Cache manager initialized
 First query: 2.34s (cache miss)
@@ -817,15 +883,22 @@ Second query: 0.08s (cache hit)
 
 ## MCP Integration
 
+> **Prerequisites**
+>
+> - Modules used: `src.integrations.mcp_client`, `scripts.prompt_generator`, `src.integrations.agent_integration`
+> - Install MCP dependencies via `pip install -r requirements-dev.txt` (includes `mcp-use`)
+> - Provide `mcp_config.json` (set `MCP_CONFIG_PATH` if stored elsewhere) and optional `GITHUB_TOKEN` for documentation fetchers
+
 The MCP (Model Context Protocol) integration provides enhanced prompts with up-to-date NeMo Retriever documentation.
 
 ### Example 1: Basic MCP Client Usage
 
-**Source:** [examples/usage_example.py:20-37](../examples/usage_example.py#L20)
+**Source:** [`examples/usage_example.py#L20-L37`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/examples/usage_example.py#L20-L37)
 
 **Complete Code:**
+
 ```python
-from mcp_client import create_mcp_client
+from src.integrations.mcp_client import create_mcp_client
 
 # Create MCP client
 client = create_mcp_client()
@@ -846,6 +919,7 @@ for i, doc in enumerate(docs, 1):
 ```
 
 **Expected Output:**
+
 ```
 ✅ MCP client created
 
@@ -865,11 +939,12 @@ for i, doc in enumerate(docs, 1):
 
 ### Example 2: Enhanced Prompt Generation
 
-**Source:** [examples/usage_example.py:40-57](../examples/usage_example.py#L40)
+**Source:** [`examples/usage_example.py#L40-L57`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/examples/usage_example.py#L40-L57)
 
 **Complete Code:**
+
 ```python
-from prompt_generator import MCPPromptGenerator
+from scripts.prompt_generator import MCPPromptGenerator
 
 generator = MCPPromptGenerator()
 
@@ -886,6 +961,7 @@ print("=" * 60)
 ```
 
 **Expected Output:**
+
 ```
 📝 Generated Migration Prompt:
 ============================================================
@@ -904,11 +980,12 @@ Migration steps:
 
 ### Example 3: Troubleshooting Assistant
 
-**Source:** [examples/usage_example.py:59-76](../examples/usage_example.py#L59)
+**Source:** [`examples/usage_example.py#L59-L76`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/examples/usage_example.py#L59-L76)
 
 **Complete Code:**
+
 ```python
-from prompt_generator import MCPPromptGenerator
+from scripts.prompt_generator import MCPPromptGenerator
 
 generator = MCPPromptGenerator()
 
@@ -924,6 +1001,7 @@ print("=" * 60)
 ```
 
 **Expected Output:**
+
 ```
 🔧 Generated Troubleshooting Prompt:
 ============================================================
@@ -944,11 +1022,12 @@ Relevant documentation:
 
 ### Example 4: Enhanced Agent with Auto Context
 
-**Source:** [examples/usage_example.py:78-100](../examples/usage_example.py#L78)
+**Source:** [`examples/usage_example.py#L78-L100`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/examples/usage_example.py#L78-L100)
 
 **Complete Code:**
+
 ```python
-from agent_integration import MCPEnhancedAgent
+from src.integrations.agent_integration import MCPEnhancedAgent
 
 # Initialize agent with MCP integration
 agent = MCPEnhancedAgent()
@@ -971,6 +1050,7 @@ print(enhanced_query[:300] + "...")
 ```
 
 **Expected Output:**
+
 ```
 🏥 Agent Health Check:
   MCP Client Active: True
@@ -987,9 +1067,16 @@ Based on latest NVIDIA NeMo Retriever documentation, here's how to optimize embe
 
 ## Monitoring & Analytics
 
+> **Prerequisites**
+>
+> - Modules used: `src.monitoring.credit_tracker`, `src.monitoring.endpoint_health_monitor`, `src.monitoring.pharmaceutical_cost_analyzer`
+> - Export `NVIDIA_API_KEY`; optionally set `MONITORING_OUTPUT_DIR` or `ENABLE_MONITORING_ALERTS`
+> - Allow write access to `logs/` and `cache/` for usage histories
+
 ### Example 1: Credit Tracking
 
 **Complete Code:**
+
 ```python
 from src.monitoring.credit_tracker import CreditTracker
 
@@ -1015,6 +1102,7 @@ for operation, count in breakdown.items():
 ```
 
 **Expected Output:**
+
 ```
 ✅ Credit tracker initialized
 
@@ -1034,6 +1122,7 @@ for operation, count in breakdown.items():
 ### Example 2: Performance Monitoring
 
 **Complete Code:**
+
 ```python
 from src.monitoring.endpoint_health_monitor import EndpointHealthMonitor
 
@@ -1054,6 +1143,7 @@ for endpoint, status in health.items():
 ```
 
 **Expected Output:**
+
 ```
 ✅ Endpoint monitor initialized
 
@@ -1077,6 +1167,7 @@ for endpoint, status in health.items():
 ### Example 3: Pharmaceutical Cost Analysis
 
 **Complete Code:**
+
 ```python
 from src.monitoring.pharmaceutical_cost_analyzer import PharmaceuticalCostAnalyzer
 
@@ -1103,6 +1194,7 @@ for category, cost in report['breakdown'].items():
 ```
 
 **Expected Output:**
+
 ```
 ✅ Cost analyzer initialized
 
@@ -1122,9 +1214,16 @@ for category, cost in report['breakdown'].items():
 
 ## Production Patterns
 
+> **Prerequisites**
+>
+> - Modules used: `src.enhanced_rag_agent`, `src.nvidia_embeddings`, `src.vector_database`, `src.pubmed_scraper`
+> - Export `NVIDIA_API_KEY`, `PUBMED_EMAIL`, and configure optional `NEMO_EMBEDDING_ENDPOINT`
+> - Enable guardrails via `ENABLE_GUARDRAILS=true` when testing safety fallbacks
+
 ### Example 1: Error Handling
 
 **Complete Code:**
+
 ```python
 import logging
 from src.enhanced_rag_agent import EnhancedRAGAgent
@@ -1192,6 +1291,7 @@ except Exception as e:
 ### Example 2: Retry Logic with Exponential Backoff
 
 **Complete Code:**
+
 ```python
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import requests
@@ -1222,6 +1322,7 @@ except Exception as e:
 ### Example 3: Health Checks
 
 **Complete Code:**
+
 ```python
 from src.nvidia_embeddings import NVIDIAEmbeddings
 from src.vector_database import VectorDatabase
@@ -1291,6 +1392,7 @@ for component, status in health['components'].items():
 ```
 
 **Expected Output:**
+
 ```
 Overall status: healthy
 ✅ embeddings: healthy
@@ -1301,6 +1403,7 @@ Overall status: healthy
 ### Example 4: Graceful Degradation
 
 **Complete Code:**
+
 ```python
 from src.nvidia_embeddings import NVIDIAEmbeddings
 import os
@@ -1342,9 +1445,16 @@ else:
 
 ## Testing Examples
 
+> **Prerequisites**
+>
+> - Install dev dependencies: `pip install -r requirements-dev.txt`
+> - Export `NVIDIA_API_KEY` (integration tests call live endpoints unless mocked)
+> - Ensure `pytest`, `coverage`, and `tenacity` are available in the active environment
+
 ### Example 1: Unit Test Pattern
 
 **Complete Code:**
+
 ```python
 import pytest
 from src.nvidia_embeddings import NVIDIAEmbeddings
@@ -1378,6 +1488,7 @@ if __name__ == "__main__":
 ### Example 2: Integration Test with Mocking
 
 **Complete Code:**
+
 ```python
 import pytest
 from unittest.mock import Mock, patch
@@ -1410,6 +1521,7 @@ if __name__ == "__main__":
 ### Example 3: Pharmaceutical Benchmark
 
 **Complete Code:**
+
 ```bash
 # Run drug interaction benchmarks
 pytest tests/test_pharmaceutical_benchmarks.py::test_drug_interactions -v
@@ -1426,9 +1538,16 @@ pytest tests/test_pharmaceutical_benchmarks.py --cov=src --cov-report=html
 
 ## Complete Workflows
 
+> **Prerequisites**
+>
+> - Modules used: `src.document_loader`, `src.nvidia_embeddings`, `src.vector_database`, `src.pharmaceutical_query_adapter`, `src.nemo_reranking_service`, `src.enhanced_rag_agent`, `src.pharmaceutical.safety_alert_integration`
+> - Export `NVIDIA_API_KEY`, `PHARMACEUTICAL_RESEARCH_MODE`, `PUBMED_EMAIL`, and `ENABLE_MEDICAL_GUARDRAILS`
+> - Provide curated documents in `Data/Docs/` and ensure vector stores (`./vector_db`) are writable
+
 ### End-to-End Pharmaceutical RAG Workflow
 
 **Prerequisites:**
+
 ```bash
 # Set environment variables
 export NVIDIA_API_KEY="nvapi-your-key-here"
@@ -1438,6 +1557,7 @@ export ENABLE_MEDICAL_GUARDRAILS=true
 ```
 
 **Complete Code:**
+
 ```python
 from src.document_loader import DocumentLoader
 from src.nvidia_embeddings import NVIDIAEmbeddings
@@ -1531,6 +1651,7 @@ print("✅ Workflow completed successfully")
 ```
 
 **Expected Output:**
+
 ```
 🏥 Pharmaceutical RAG Workflow
 ============================================================
@@ -1579,22 +1700,31 @@ Warfarin and aspirin interact through multiple mechanisms. Warfarin inhibits vit
 
 ## Cross-References
 
+> **Prerequisites**
+>
+> - None; this section links to related documentation
+> - Keep the repository cloned or open GitHub for the referenced Markdown files
+
 ### Configuration & Setup
+
 - [API Reference](API_REFERENCE.md) - Configuration details
-- [Environment Variables](.env.example) - All available settings
+- [Environment Variables](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/.env.example) - All available settings
 - [Development Guide](DEVELOPMENT.md) - Setup instructions
 
 ### Advanced Topics
+
 - [API Integration Guide](API_INTEGRATION_GUIDE.md) - Advanced patterns
 - [Features](FEATURES.md) - Feature explanations
 - [Pharmaceutical Best Practices](PHARMACEUTICAL_BEST_PRACTICES.md) - Domain guidelines
 
 ### Operations & Monitoring
+
 - [Free Tier Maximization](FREE_TIER_MAXIMIZATION.md) - Cost optimization
 - [Cheapest Deployment](CHEAPEST_DEPLOYMENT.md) - Budget deployment
 - [Troubleshooting Guide](TROUBLESHOOTING_GUIDE.md) - Diagnostics
 
 ### Architecture
+
 - [Architecture Documentation](ARCHITECTURE.md) - System design
 - [ADR-0001: NeMo Retriever Adoption](adr/0001-use-nemo-retriever.md) - Decision rationale
 - [NGC Deprecation Immunity](NGC_DEPRECATION_IMMUNITY.md) - NGC independence
@@ -1604,4 +1734,4 @@ Warfarin and aspirin interact through multiple mechanisms. Warfarin inhibits vit
 **Last Verified:** 2025-10-03
 **Examples Count:** 40+
 **Test Coverage:** All examples validated
-**Source Code:** [examples/](../examples/) | [src/](../src/)
+**Source Code:** [examples/](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/tree/main/examples) | [src/](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/tree/main/src)

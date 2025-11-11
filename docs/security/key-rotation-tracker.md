@@ -146,7 +146,7 @@ Tracks all API key rotations performed as part of git history cleanup and ongoin
 
 ## References
 
-- [Security Policy](../../SECURITY.md)
+- [Security Policy](../SECURITY.md)
 - [Git History Cleanup Documentation](history-redaction.md)
 - [NVIDIA API Key Management](https://build.nvidia.com)
 - [PubMed API Key Management](https://www.ncbi.nlm.nih.gov/account/)

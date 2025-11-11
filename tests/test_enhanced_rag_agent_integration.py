@@ -2,7 +2,8 @@
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
 
@@ -11,7 +12,6 @@ import pytest
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from src.enhanced_config import EnhancedRAGConfig
-from src.enhanced_pubmed_scraper import EnhancedPubMedScraper
 from src.enhanced_rag_agent import EnhancedRAGAgent
 from src.pharmaceutical_query_adapter import (
     SystemHealthReport,
@@ -19,6 +19,7 @@ from src.pharmaceutical_query_adapter import (
     build_integrated_system,
     check_system_health,
 )
+from src.pubmed_scraper import PubMedScraper
 from src.query_engine import EnhancedQueryEngine
 
 
@@ -59,7 +60,7 @@ class TestEnhancedRAGAgentPubMedIntegration:
     @pytest.fixture
     def mock_pubmed_scraper(self):
         """Create a mock PubMed scraper."""
-        scraper = Mock(spec=EnhancedPubMedScraper)
+        scraper = Mock(spec=PubMedScraper)
         scraper.search_pubmed.return_value = [
             {
                 "pubmed_id": "12345",
@@ -129,8 +130,8 @@ class TestEnhancedRAGAgentPubMedIntegration:
     def test_ensure_pubmed_components_creates_components(self, rag_agent, mock_pubmed_scraper, mock_query_engine):
         """Test that PubMed components are created when needed."""
         # Mock the component creation
-        with patch("src.enhanced_pubmed_scraper.EnhancedPubMedScraper", return_value=mock_pubmed_scraper), patch(
-            "src.query_engine.EnhancedQueryEngine", return_value=mock_query_engine
+        with patch("src.enhanced_pubmed_agent.PubMedScraper", return_value=mock_pubmed_scraper), patch(
+            "src.enhanced_pubmed_agent.EnhancedQueryEngine", return_value=mock_query_engine
         ):
             rag_agent._ensure_pubmed_components()
 
@@ -263,8 +264,8 @@ class TestBuildEnhancedRAGAgent:
     def test_build_enhanced_rag_agent_with_pubmed(self, temp_docs_folder, mock_config):
         """Test building enhanced RAG agent with PubMed integration."""
         with patch("src.enhanced_rag_agent.EnhancedRAGAgent") as mock_agent_class, patch(
-            "src.enhanced_pubmed_scraper.EnhancedPubMedScraper"
-        ) as mock_scraper_class, patch("src.query_engine.EnhancedQueryEngine") as mock_engine_class:
+            "src.pharmaceutical_query_adapter.PubMedScraper"
+        ) as mock_scraper_class, patch("src.pharmaceutical_query_adapter.EnhancedQueryEngine") as mock_engine_class:
             agent = build_enhanced_rag_agent(docs_folder=temp_docs_folder, api_key="test_key", config=mock_config)
 
             # Should create PubMed components
@@ -342,7 +343,7 @@ class TestBuildEnhancedRAGAgent:
         config.enable_rate_limiting = False
 
         with patch("src.enhanced_rag_agent.EnhancedRAGAgent") as mock_agent_class, patch(
-            "src.enhanced_pubmed_scraper.EnhancedPubMedScraper"
+            "src.pharmaceutical_query_adapter.PubMedScraper"
         ) as mock_scraper_class:
             agent = build_enhanced_rag_agent(docs_folder=temp_docs_folder, api_key="test_key", config=config)
 

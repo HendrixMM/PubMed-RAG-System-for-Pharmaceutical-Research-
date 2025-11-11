@@ -40,6 +40,7 @@ Review Cadence: Monthly
 This directory contains versioned benchmark datasets for evaluating pharmaceutical RAG query performance, accuracy, and cost efficiency. These benchmarks test the system's ability to handle domain-specific pharmaceutical queries across multiple categories.
 
 **Purpose:**
+
 - Evaluate pharmaceutical RAG performance
 - Track accuracy and quality metrics
 - Monitor cost efficiency
@@ -50,7 +51,7 @@ This directory contains versioned benchmark datasets for evaluating pharmaceutic
 
 ## Dataset Categories
 
-### 1. Drug Interactions (drug_interactions_v*.json)
+### 1. Drug Interactions (drug_interactions_v\*.json)
 
 Tests the system's ability to identify and explain drug-drug interactions, including:
 
@@ -63,11 +64,12 @@ Tests the system's ability to identify and explain drug-drug interactions, inclu
 **Query Types:** Comparison, retrieval, reasoning
 **Expected Response:** Detailed interaction mechanisms, clinical implications, monitoring requirements
 **Example Queries:**
+
 - "What are the interaction mechanisms between warfarin and aspirin?"
 - "How does rifampin affect the metabolism of oral contraceptives?"
 - "Explain the pharmacodynamic interaction between ACE inhibitors and NSAIDs"
 
-### 2. Pharmacokinetics (pharmacokinetics_v*.json)
+### 2. Pharmacokinetics (pharmacokinetics_v\*.json)
 
 Evaluates understanding of ADME (Absorption, Distribution, Metabolism, Excretion) properties:
 
@@ -80,11 +82,12 @@ Evaluates understanding of ADME (Absorption, Distribution, Metabolism, Excretion
 **Query Types:** Scientific, retrieval
 **Expected Response:** Quantitative pharmacokinetic parameters, pathway details
 **Example Queries:**
+
 - "What is the bioavailability and half-life of metoprolol?"
 - "Which CYP450 enzymes metabolize simvastatin?"
 - "How does renal impairment affect digoxin clearance?"
 
-### 3. Clinical Terminology (clinical_terminology_v*.json)
+### 3. Clinical Terminology (clinical_terminology_v\*.json)
 
 Tests medical and pharmaceutical terminology comprehension:
 
@@ -97,11 +100,12 @@ Tests medical and pharmaceutical terminology comprehension:
 **Query Types:** Definition, classification
 **Expected Response:** Accurate terminology definitions, proper classifications
 **Example Queries:**
+
 - "What is the ATC classification of metformin?"
 - "Define the term 'first-pass metabolism'"
 - "List common dosage forms for oral medications"
 
-### 4. Mechanism of Action (mechanism_of_action_v*.json)
+### 4. Mechanism of Action (mechanism_of_action_v\*.json)
 
 Assesses understanding of drug mechanisms and molecular targets:
 
@@ -114,11 +118,12 @@ Assesses understanding of drug mechanisms and molecular targets:
 **Query Types:** Scientific, reasoning
 **Expected Response:** Detailed molecular mechanisms, pathway diagrams (when applicable)
 **Example Queries:**
+
 - "Explain the mechanism of action of ACE inhibitors"
 - "How do statins lower cholesterol levels?"
 - "Describe the receptor targets of beta-blockers"
 
-### 5. Adverse Reactions (adverse_reactions_v*.json)
+### 5. Adverse Reactions (adverse_reactions_v\*.json)
 
 Evaluates knowledge of drug safety profiles:
 
@@ -131,6 +136,7 @@ Evaluates knowledge of drug safety profiles:
 **Query Types:** Safety, retrieval
 **Expected Response:** Comprehensive safety information, clinical management guidance
 **Example Queries:**
+
 - "What are the black box warnings for warfarin?"
 - "List common adverse effects of metformin"
 - "How is statin-induced rhabdomyolysis managed?"
@@ -166,6 +172,7 @@ Each benchmark dataset follows this JSON schema:
 ```
 
 **Validation:**
+
 ```bash
 # Validate benchmark structure
 python scripts/config_validator.py benchmarks/drug_interactions_v1.json
@@ -180,6 +187,7 @@ python scripts/config_validator.py benchmarks/drug_interactions_v1.json
 **Immutability:** Versions are immutable once created. New queries are added in new versions to enable regression testing.
 
 **Version Naming:**
+
 ```
 drug_interactions_v1.json
 drug_interactions_v2.json
@@ -199,19 +207,21 @@ Benchmark queries are derived from:
 
 Drug names sourced from:
 
-- [Data/drugs_brand.txt](../Data/drugs_brand.txt) (345 brand names)
-- [Data/drugs_generic.txt](../Data/drugs_generic.txt) (344 generic names)
+- `Data/drugs_brand.txt` (345 brand names)
+- `Data/drugs_generic.txt` (344 generic names)
 
 ## Running Benchmarks
 
 ### Basic Usage
 
 **Run All Benchmarks:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py
 ```
 
 **Expected Output:**
+
 ```
 🧪 Running Pharmaceutical Benchmarks
 =====================================
@@ -236,6 +246,7 @@ Overall Performance:
 ```
 
 **Run Specific Category:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py --category drug_interactions
 
@@ -243,6 +254,7 @@ python scripts/run_pharmaceutical_benchmarks.py --category drug_interactions
 ```
 
 **Run Specific Version:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py --version 1
 
@@ -250,6 +262,7 @@ python scripts/run_pharmaceutical_benchmarks.py --version 1
 ```
 
 **Run with Concurrency:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py --concurrency 4
 
@@ -257,6 +270,7 @@ python scripts/run_pharmaceutical_benchmarks.py --concurrency 4
 ```
 
 **Simulation Mode (No API Calls):**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py --simulate
 
@@ -266,6 +280,7 @@ python scripts/run_pharmaceutical_benchmarks.py --simulate
 ### Advanced Options
 
 **Use Preset Configuration:**
+
 ```bash
 # Quick test (small sample)
 python scripts/run_pharmaceutical_benchmarks.py --preset quick-test
@@ -278,6 +293,7 @@ python scripts/run_pharmaceutical_benchmarks.py --preset cost-optimized
 ```
 
 **List Available Presets:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py --list-presets
 
@@ -290,6 +306,7 @@ python scripts/run_pharmaceutical_benchmarks.py --list-presets
 ```
 
 **Adaptive Concurrency with Budget:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py \
   --adaptive-concurrency \
@@ -300,6 +317,7 @@ python scripts/run_pharmaceutical_benchmarks.py \
 ```
 
 **Compare with Baseline:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py \
   --category drug_interactions \
@@ -311,6 +329,7 @@ python scripts/run_pharmaceutical_benchmarks.py \
 ```
 
 **Validate Classifier Predictions:**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py \
   --validate-classifier \
@@ -320,6 +339,7 @@ python scripts/run_pharmaceutical_benchmarks.py \
 ```
 
 **Dual Mode (Cloud + Self-Hosted Comparison):**
+
 ```bash
 python scripts/run_pharmaceutical_benchmarks.py \
   --mode dual \
@@ -332,23 +352,27 @@ python scripts/run_pharmaceutical_benchmarks.py \
 ### Preset Configurations
 
 **Quick Test:**
+
 - Sample: 10 queries per category
 - Concurrency: 1
 - Use case: Development, smoke testing
 
 **Production:**
+
 - All queries
 - Concurrency: 2
 - Full metrics collection
 - Use case: Pre-release validation
 
 **Cost-Optimized:**
+
 - Batch size: 20
 - Caching: Enabled
 - Concurrency: 1
 - Use case: Free tier conservation
 
 **Regression:**
+
 - Compare against baseline
 - All queries
 - Detailed diff report
@@ -393,7 +417,7 @@ For reproducibility, record this metadata with every benchmark run:
     "p50_latency_ms": 1100,
     "p95_latency_ms": 2300,
     "p99_latency_ms": 3100,
-    "total_cost_usd": 0.50,
+    "total_cost_usd": 0.5,
     "cost_per_query": 0.01
   }
 }
@@ -401,38 +425,43 @@ For reproducibility, record this metadata with every benchmark run:
 
 ### Hardware Compatibility Matrix
 
-| Hardware | Embedding Speed | Reranking Speed | Memory Usage |
-|----------|-----------------|-----------------|--------------|
-| M1 Pro (cloud) | 0.8s/query | 0.3s/query | 2GB |
-| Intel i7 (cloud) | 1.2s/query | 0.4s/query | 2GB |
-| GPU (self-hosted) | 0.2s/query | 0.1s/query | 8GB VRAM |
-| CPU (self-hosted) | 3.5s/query | 1.2s/query | 4GB |
+| Hardware          | Embedding Speed | Reranking Speed | Memory Usage |
+| ----------------- | --------------- | --------------- | ------------ |
+| M1 Pro (cloud)    | 0.8s/query      | 0.3s/query      | 2GB          |
+| Intel i7 (cloud)  | 1.2s/query      | 0.4s/query      | 2GB          |
+| GPU (self-hosted) | 0.2s/query      | 0.1s/query      | 8GB VRAM     |
+| CPU (self-hosted) | 3.5s/query      | 1.2s/query      | 4GB          |
 
 ## Performance Metrics
 
 ### Metrics Tracked
 
 **Accuracy (0-1 scale):**
+
 - Correctness of information
 - Factual alignment with expected content
 - Detection of hallucinations
 
 **Completeness (0-1 scale):**
+
 - Coverage of expected content points
 - Comprehensiveness of response
 - Missing critical information
 
 **Relevance (0-1 scale):**
+
 - Alignment with query intent
 - Topical relevance
 - Context appropriateness
 
 **Overall Score:**
+
 ```
 overall_score = (accuracy × 0.4) + (completeness × 0.3) + (relevance × 0.3)
 ```
 
 **Latency Metrics:**
+
 - **p50 (median)**: 50th percentile response time
 - **p95**: 95th percentile (outlier threshold)
 - **p99**: 99th percentile (worst-case scenario)
@@ -440,16 +469,19 @@ overall_score = (accuracy × 0.4) + (completeness × 0.3) + (relevance × 0.3)
 - **Stddev**: Standard deviation
 
 **Cost Metrics:**
+
 - Credits/USD per query
 - Total cost per benchmark run
 - Cost efficiency ratio (score/cost)
 
 **Throughput:**
+
 - Queries per second
 - Queries per minute
 - Daily query capacity
 
 **Token Usage:**
+
 - Input tokens per query
 - Output tokens per query
 - Total tokens per benchmark
@@ -475,6 +507,7 @@ print(f"p99: {p99:.0f}ms")
 ### Regression Report
 
 **Compare Two Benchmark Runs:**
+
 ```bash
 python scripts/pharmaceutical_benchmark_report.py \
   --compare results/baseline_v1.json results/current_v1.json
@@ -483,6 +516,7 @@ python scripts/pharmaceutical_benchmark_report.py \
 ```
 
 **Expected Output:**
+
 ```
 📊 Benchmark Comparison Report
 ==============================
@@ -534,6 +568,7 @@ python scripts/orchestrate_benchmarks.py \
 ```
 
 **Example Output:**
+
 ```
 🚀 Orchestrating Benchmarks
 ===========================
@@ -556,24 +591,28 @@ Summary:
 All benchmark queries undergo:
 
 ### 1. Clinical Validation
+
 - Review by pharmaceutical domain experts
 - Verification against authoritative sources (FDA labels, clinical guidelines)
 - Accuracy of expected content
 - Clinical relevance
 
 ### 2. Technical Validation
+
 - Ensure expected_content is achievable by RAG system
 - Verify query complexity is appropriate
 - Test for edge cases and ambiguity
 - Validate JSON schema compliance
 
 ### 3. Diversity Check
+
 - Balanced coverage across drug classes
 - Multiple therapeutic areas represented
 - Range of query difficulties (easy, medium, hard)
 - Variety of query types (factual, reasoning, comparison)
 
 ### 4. Difficulty Calibration
+
 - Mix of straightforward and complex queries
 - 40% easy queries (factual retrieval)
 - 40% medium queries (synthesis required)
@@ -584,18 +623,21 @@ All benchmark queries undergo:
 ### Quality Metrics
 
 **Accuracy (0-1):**
+
 - 0.9-1.0: Excellent (all facts correct)
 - 0.8-0.9: Good (minor inaccuracies)
 - 0.7-0.8: Acceptable (some errors)
 - <0.7: Poor (major errors or hallucinations)
 
 **Completeness (0-1):**
+
 - 0.9-1.0: Comprehensive (all expected points covered)
 - 0.8-0.9: Good (most points covered)
 - 0.7-0.8: Partial (key points missing)
 - <0.7: Incomplete (significant gaps)
 
 **Relevance (0-1):**
+
 - 0.9-1.0: Highly relevant (directly addresses query)
 - 0.8-0.9: Relevant (on-topic with minor tangents)
 - 0.7-0.8: Somewhat relevant (partially off-topic)
@@ -606,18 +648,22 @@ All benchmark queries undergo:
 Regression is flagged when:
 
 **Accuracy Regression:**
+
 - Accuracy drops > 5% from previous version
 - Example: 0.87 → 0.82 (5.7% drop) ⚠️
 
 **Cost Regression:**
+
 - Cost per query increases > 20% without quality improvement
 - Example: $0.01 → $0.013 with same accuracy ⚠️
 
 **Latency Regression:**
+
 - Response time increases > 50% from baseline
 - Example: p95 latency 1500ms → 2300ms (53% increase) ⚠️
 
 **Classifier Validation:**
+
 - Classifier accuracy < 90% on query classification
 - Example: 85% correct query type predictions ⚠️
 
@@ -626,7 +672,9 @@ Regression is flagged when:
 Benchmarks integrate with:
 
 ### PharmaceuticalCostAnalyzer
+
 Track credits usage per query type:
+
 ```python
 from src.monitoring.pharmaceutical_cost_analyzer import PharmaceuticalCostAnalyzer
 
@@ -639,7 +687,9 @@ analyzer.track_benchmark_run(
 ```
 
 ### EnhancedNeMoClient
+
 Execute queries against NeMo models:
+
 ```python
 from src.enhanced_nemo_client import EnhancedNeMoClient
 
@@ -651,14 +701,18 @@ response = client.query(
 ```
 
 ### Monitoring Dashboard
+
 Real-time performance visualization:
+
 - Live accuracy graphs
 - Cost tracking
 - Latency distribution
 - Regression alerts
 
 ### CI/CD Pipeline
+
 Automated regression testing:
+
 ```yaml
 # .github/workflows/benchmarks.yml
 - name: Run Pharmaceutical Benchmarks
@@ -674,42 +728,50 @@ Automated regression testing:
 ### Good Performance Indicators
 
 **Quality:**
+
 - Accuracy > 0.85
 - Completeness > 0.80
 - Relevance > 0.85
 - Overall score > 0.83
 
 **Performance:**
+
 - Latency p50 < 1500ms
 - Latency p95 < 2000ms
 - Latency p99 < 3000ms
 
 **Cost:**
+
 - Cost per query < $0.02
 - Cost efficiency > 40 (score/cost)
 
 **Consistency:**
+
 - Accuracy stddev < 0.10
 - Low variance across categories
 
 ### Regression Indicators
 
 **Quality Regression:**
+
 - Accuracy drop > 5% from baseline
 - Increased hallucination rate
 - Lower completeness scores
 
 **Performance Regression:**
+
 - Latency increase > 50% from baseline
 - Higher p99 latency (outliers)
 - Throughput decrease
 
 **Cost Regression:**
+
 - Cost increase > 20% without quality improvement
 - Higher token usage per query
 - Inefficient batching
 
 **Classifier Issues:**
+
 - Validation accuracy < 0.90
 - Misclassified query types
 - Incorrect pharmaceutical entity extraction
@@ -738,6 +800,7 @@ Interpretation:
 **Symptom:** HTTP 429 errors, incomplete benchmark runs
 
 **Solution:**
+
 ```bash
 # Enable rate limiting
 export ENABLE_RATE_LIMITING=true
@@ -755,6 +818,7 @@ python scripts/run_pharmaceutical_benchmarks.py --preset cost-optimized
 **Symptom:** Out of memory errors, system slowdown
 
 **Solution:**
+
 ```bash
 # Reduce batch size
 export EMBEDDING_BATCH_SIZE=5
@@ -773,6 +837,7 @@ export ENABLE_AGGRESSIVE_GC=true
 **Symptom:** Same query produces different scores across runs
 
 **Solution:**
+
 ```bash
 # Enable deterministic mode
 export DETERMINISTIC_MODE=true
@@ -792,6 +857,7 @@ python scripts/run_pharmaceutical_benchmarks.py --runs 3 --average
 **Symptom:** FileNotFoundError for benchmark files
 
 **Solution:**
+
 ```bash
 # Generate missing benchmarks
 python scripts/generate_pharmaceutical_benchmarks.py
@@ -812,6 +878,7 @@ ls benchmarks/
 **Symptom:** Low classifier accuracy, misclassified queries
 
 **Solution:**
+
 ```bash
 # Retrain classifier with updated data
 python scripts/train_pharmaceutical_classifier.py
@@ -828,18 +895,21 @@ python scripts/run_pharmaceutical_benchmarks.py \
 ## Maintenance
 
 ### Monthly Tasks
+
 - Review new drug approvals and update datasets
 - Check for outdated drug information
 - Add queries for newly identified edge cases
 - Update drug name lists from FDA
 
 ### Quarterly Tasks
+
 - Generate new benchmark versions
 - Run regression tests against all versions
 - Update expected content based on new literature
 - Review and update quality thresholds
 
 ### Annual Tasks
+
 - Major dataset revision with clinical expert review
 - Comprehensive coverage analysis
 - Difficulty recalibration
@@ -851,6 +921,7 @@ python scripts/run_pharmaceutical_benchmarks.py \
 When adding new benchmark queries:
 
 1. **Follow JSON Schema:**
+
    ```json
    {
      "id": "unique_id",
@@ -867,22 +938,26 @@ When adding new benchmark queries:
    ```
 
 2. **Ensure Clinical Accuracy:**
+
    - Verify against FDA-approved labels
    - Cross-reference with multiple authoritative sources
    - Review by pharmaceutical domain expert
 
 3. **Include Diverse Drug Examples:**
+
    - Cover multiple therapeutic classes
    - Include brand and generic names
    - Represent various mechanisms of action
 
 4. **Tag Appropriately:**
+
    - Drug classes (anticoagulants, statins, etc.)
    - Therapeutic areas (cardiology, oncology, etc.)
    - Query difficulty (easy, medium, hard)
    - Special populations (geriatric, pediatric, renal impairment)
 
 5. **Update Manifest:**
+
    ```bash
    # Update benchmarks_manifest.yaml
    vim benchmarks/benchmarks_manifest.yaml
@@ -898,6 +973,7 @@ When adding new benchmark queries:
 ## Files Reference
 
 **Benchmark Datasets:**
+
 - `benchmarks/drug_interactions_v*.json` - Drug interaction benchmarks
 - `benchmarks/pharmacokinetics_v*.json` - ADME property benchmarks
 - `benchmarks/clinical_terminology_v*.json` - Medical terminology benchmarks
@@ -905,40 +981,48 @@ When adding new benchmark queries:
 - `benchmarks/adverse_reactions_v*.json` - Safety profile benchmarks
 
 **Scripts:**
-- [scripts/run_pharmaceutical_benchmarks.py](../scripts/run_pharmaceutical_benchmarks.py) - Main benchmark runner
-- [scripts/generate_pharmaceutical_benchmarks.py](../scripts/generate_pharmaceutical_benchmarks.py) - Generate new benchmarks
-- [scripts/pharmaceutical_benchmark_report.py](../scripts/pharmaceutical_benchmark_report.py) - Generate reports
-- [scripts/benchmarks_report.py](../scripts/benchmarks_report.py) - Detailed HTML reports
-- [scripts/orchestrate_benchmarks.py](../scripts/orchestrate_benchmarks.py) - Orchestrate multiple runs
+
+- `scripts/run_pharmaceutical_benchmarks.py` - Main benchmark runner
+- `scripts/generate_pharmaceutical_benchmarks.py` - Generate new benchmarks
+- `scripts/pharmaceutical_benchmark_report.py` - Generate reports
+- `scripts/benchmarks_report.py` - Detailed HTML reports
+- `scripts/orchestrate_benchmarks.py` - Orchestrate multiple runs
 
 **Data Sources:**
-- [Data/drugs_brand.txt](../Data/drugs_brand.txt) - 345 brand names
-- [Data/drugs_generic.txt](../Data/drugs_generic.txt) - 344 generic names
+
+- `Data/drugs_brand.txt` - 345 brand names
+- `Data/drugs_generic.txt` - 344 generic names
 
 **Configuration:**
+
 - `benchmarks/benchmarks_manifest.yaml` - Dataset metadata and versioning
 
 **Documentation:**
+
 - `benchmarks/README.md` - Original benchmark documentation (consolidated into this file)
 - [docs/BENCHMARKS.md](./BENCHMARKS.md) - This comprehensive guide
 
 ## Cross-References
 
 ### Related Documentation
+
 - [API Reference](API_REFERENCE.md) - Configuration for benchmark execution
 - [Examples](EXAMPLES.md) - Code examples for running benchmarks
 - [Development Guide](DEVELOPMENT.md) - Testing integration
 - [Troubleshooting Guide](TROUBLESHOOTING_GUIDE.md) - Diagnostic procedures
 
 ### Architecture
+
 - [Architecture Documentation](ARCHITECTURE.md) - System design
 - [ADR-0001: NeMo Retriever Adoption](adr/0001-use-nemo-retriever.md) - Technology decision
 
 ### Operations
+
 - [Free Tier Maximization](FREE_TIER_MAXIMIZATION.md) - Cost optimization
 - [Cheapest Deployment](CHEAPEST_DEPLOYMENT.md) - Budget deployment
 
 ### Pharmaceutical Domain
+
 - [Pharmaceutical Best Practices](PHARMACEUTICAL_BEST_PRACTICES.md) - Domain guidelines
 - [Features](FEATURES.md) - Pharmaceutical features
 
@@ -949,6 +1033,7 @@ These benchmarks are derived from publicly available pharmaceutical data sources
 **⚠️ NOT FOR CLINICAL DECISION-MAKING**
 
 All benchmark queries and expected responses are for system evaluation only. Do not use for:
+
 - Clinical diagnosis
 - Treatment decisions
 - Drug prescribing

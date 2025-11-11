@@ -16,7 +16,13 @@ Design Principles:
 import logging
 import os
 import time
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import TYPE_CHECKING
+from typing import Union
 
 import requests
 
@@ -1069,7 +1075,7 @@ class OpenAIWrapper:
         query: str,
         candidates: List[str],
         top_n: Optional[int] = None,
-        model: str = "meta/llama-3_2-nemoretriever-500m-rerank-v2",
+        model: str = "nvidia/llama-3_2-nemoretriever-500m-rerank-v2",
         max_retries: Optional[int] = None,
         backoff_base: Optional[float] = None,
         backoff_jitter: Optional[float] = None,
@@ -1234,6 +1240,7 @@ class OpenAIWrapper:
                 nvb_model_mapping = {
                     # Map common NeMo models to NVIDIA Build supported models
                     "meta/llama-3_2-nemoretriever-500m-rerank-v2": "meta/llama-3_2-nemoretriever-500m-rerank-v2",
+                    "nvidia/llama-3_2-nemoretriever-500m-rerank-v2": "meta/llama-3_2-nemoretriever-500m-rerank-v2",
                     "nvidia/nv-rerankqa-mistral4b-v3": "nvidia/nv-rerankqa-mistral4b-v3",
                     "llama-3_2-nemoretriever-500m-rerank-v2": "meta/llama-3_2-nemoretriever-500m-rerank-v2",
                     "nv-rerankqa-mistral4b-v3": "nvidia/nv-rerankqa-mistral4b-v3",
@@ -1345,7 +1352,7 @@ class OpenAIWrapper:
             query=query,
             candidates=documents,
             top_n=top_n,
-            model=(model or "meta/llama-3_2-nemoretriever-500m-rerank-v2"),
+            model=(model or "nvidia/llama-3_2-nemoretriever-500m-rerank-v2"),
         )
 
     def validate_pharmaceutical_setup(self) -> Dict[str, Any]:

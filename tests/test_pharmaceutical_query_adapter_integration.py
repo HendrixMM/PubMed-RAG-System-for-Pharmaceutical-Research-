@@ -2,7 +2,8 @@
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
 
@@ -11,7 +12,6 @@ import pytest
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from src.enhanced_config import EnhancedRAGConfig
-from src.enhanced_pubmed_scraper import EnhancedPubMedScraper
 from src.pharmaceutical_query_adapter import (
     SystemHealthReport,
     build_enhanced_pharmaceutical_query_engine,
@@ -19,6 +19,7 @@ from src.pharmaceutical_query_adapter import (
     build_integrated_system,
     check_system_health,
 )
+from src.pubmed_scraper import PubMedScraper
 from src.query_engine import EnhancedQueryEngine
 
 
@@ -40,11 +41,11 @@ class TestBuildEnhancedPharmaceuticalQueryEngine:
     @pytest.fixture
     def mock_scraper(self):
         """Create a mock PubMed scraper."""
-        return Mock(spec=EnhancedPubMedScraper)
+        return Mock(spec=PubMedScraper)
 
     def test_build_with_scraper_provided(self, mock_scraper, mock_config):
         """Test building with pre-configured scraper."""
-        with patch("src.query_engine.EnhancedQueryEngine") as mock_engine_class:
+        with patch("src.pharmaceutical_query_adapter.EnhancedQueryEngine") as mock_engine_class:
             engine = build_enhanced_pharmaceutical_query_engine(scraper=mock_scraper, config=mock_config)
 
             mock_engine_class.assert_called_once_with(
@@ -55,8 +56,8 @@ class TestBuildEnhancedPharmaceuticalQueryEngine:
 
     def test_build_creates_scraper(self, mock_config):
         """Test building creates scraper when not provided."""
-        with patch("src.enhanced_pubmed_scraper.EnhancedPubMedScraper") as mock_scraper_class, patch(
-            "src.query_engine.EnhancedQueryEngine"
+        with patch("src.pharmaceutical_query_adapter.PubMedScraper") as mock_scraper_class, patch(
+            "src.pharmaceutical_query_adapter.EnhancedQueryEngine"
         ) as mock_engine_class:
             mock_scraper = Mock()
             mock_scraper_class.return_value = mock_scraper
@@ -74,8 +75,8 @@ class TestBuildEnhancedPharmaceuticalQueryEngine:
         """Test that advanced features are disabled when flag is false."""
         mock_config.enable_enhanced_pubmed_scraper = False
 
-        with patch("src.enhanced_pubmed_scraper.EnhancedPubMedScraper") as mock_scraper_class, patch(
-            "src.query_engine.EnhancedQueryEngine"
+        with patch("src.pharmaceutical_query_adapter.PubMedScraper") as mock_scraper_class, patch(
+            "src.pharmaceutical_query_adapter.EnhancedQueryEngine"
         ) as mock_engine_class:
             build_enhanced_pharmaceutical_query_engine(config=mock_config)
 
@@ -86,9 +87,9 @@ class TestBuildEnhancedPharmaceuticalQueryEngine:
 
     def test_build_with_default_config(self):
         """Test building with default configuration."""
-        with patch("src.enhanced_config.EnhancedRAGConfig") as mock_config_class, patch(
-            "src.enhanced_pubmed_scraper.EnhancedPubMedScraper"
-        ) as mock_scraper_class, patch("src.query_engine.EnhancedQueryEngine") as mock_engine_class:
+        with patch("src.pharmaceutical_query_adapter.EnhancedRAGConfig") as mock_config_class, patch(
+            "src.pharmaceutical_query_adapter.PubMedScraper"
+        ) as mock_scraper_class, patch("src.pharmaceutical_query_adapter.EnhancedQueryEngine") as mock_engine_class:
             mock_config = Mock()
             mock_config.enable_rate_limiting = True
             mock_config.enable_advanced_caching = True
@@ -131,7 +132,7 @@ class TestBuildEnhancedRAGAgent:
     def test_build_with_pubmed_integration(self, temp_docs_folder, mock_config):
         """Test building RAG agent with PubMed integration."""
         with patch("src.pharmaceutical_query_adapter.EnhancedRAGAgent") as mock_agent_class, patch(
-            "src.pharmaceutical_query_adapter.EnhancedPubMedScraper"
+            "src.pharmaceutical_query_adapter.PubMedScraper"
         ) as mock_scraper_class, patch("src.pharmaceutical_query_adapter.EnhancedQueryEngine") as mock_engine_class:
             agent = build_enhanced_rag_agent(docs_folder=temp_docs_folder, api_key="test_key", config=mock_config)
 
@@ -150,7 +151,7 @@ class TestBuildEnhancedRAGAgent:
         mock_config.should_enable_pubmed.return_value = False
 
         with patch("src.pharmaceutical_query_adapter.EnhancedRAGAgent") as mock_agent_class, patch(
-            "src.pharmaceutical_query_adapter.EnhancedPubMedScraper"
+            "src.pharmaceutical_query_adapter.PubMedScraper"
         ) as mock_scraper_class, patch("src.pharmaceutical_query_adapter.EnhancedQueryEngine") as mock_engine_class:
             agent = build_enhanced_rag_agent(docs_folder=temp_docs_folder, api_key="test_key", config=mock_config)
 
@@ -165,7 +166,7 @@ class TestBuildEnhancedRAGAgent:
 
     def test_build_with_preprovided_components(self, temp_docs_folder, mock_config):
         """Test building with pre-provided PubMed components."""
-        mock_scraper = Mock(spec=EnhancedPubMedScraper)
+        mock_scraper = Mock(spec=PubMedScraper)
         mock_engine = Mock(spec=EnhancedQueryEngine)
 
         with patch("src.pharmaceutical_query_adapter.EnhancedRAGAgent") as mock_agent_class:

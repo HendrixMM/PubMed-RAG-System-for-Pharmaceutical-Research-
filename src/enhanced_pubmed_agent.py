@@ -13,7 +13,7 @@ import time
 from typing import Any
 
 from .enhanced_config import EnhancedRAGConfig
-from .enhanced_pubmed_scraper import EnhancedPubMedScraper
+from .pubmed_scraper import PubMedScraper
 from .query_engine import EnhancedQueryEngine
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class PubMedIntegrationManager:
         self,
         config: EnhancedRAGConfig,
         pubmed_query_engine: EnhancedQueryEngine | None = None,
-        pubmed_scraper: EnhancedPubMedScraper | None = None,
+        pubmed_scraper: PubMedScraper | None = None,
     ) -> None:
         """Initialize PubMed integration manager.
 
@@ -37,7 +37,7 @@ class PubMedIntegrationManager:
         """
         self.config = config
         self._pubmed_query_engine: EnhancedQueryEngine | None = pubmed_query_engine
-        self._pubmed_scraper: EnhancedPubMedScraper | None = pubmed_scraper
+        self._pubmed_scraper: PubMedScraper | None = pubmed_scraper
         self._pubmed_components_initialized = False
         self._pubmed_lock = threading.RLock()
 
@@ -65,7 +65,7 @@ class PubMedIntegrationManager:
         }
 
     @property
-    def pubmed_scraper(self) -> EnhancedPubMedScraper | None:
+    def pubmed_scraper(self) -> PubMedScraper | None:
         """Get the PubMed scraper instance. Read-only access."""
         return self._pubmed_scraper
 
@@ -100,16 +100,16 @@ class PubMedIntegrationManager:
             if self._pubmed_scraper is None:
                 try:
                     # Configure scraper based on settings
+                    advanced_enabled = (
+                        self.config.enable_enhanced_pubmed_scraper and self.config.enable_advanced_caching
+                    )
                     scraper_kwargs = {
                         "enable_rate_limiting": self.config.enable_rate_limiting,
-                        "enable_advanced_caching": self.config.enable_advanced_caching,
-                        "use_normalized_cache_keys": self.config.use_normalized_cache_keys,
+                        "enable_advanced_caching": advanced_enabled,
+                        "use_normalized_cache_keys": self.config.use_normalized_cache_keys and advanced_enabled,
                     }
-                    if not self.config.enable_enhanced_pubmed_scraper:
-                        scraper_kwargs["enable_advanced_caching"] = False
-                        scraper_kwargs["use_normalized_cache_keys"] = False
 
-                    self._pubmed_scraper = EnhancedPubMedScraper(**scraper_kwargs)
+                    self._pubmed_scraper = PubMedScraper(**scraper_kwargs)
                     pubmed_health.update(
                         status="ready",
                         scraper_type="enhanced" if self.config.enable_enhanced_pubmed_scraper else "standard",
@@ -183,7 +183,7 @@ class PubMedIntegrationManager:
             self.component_health["pubmed_integration"] = pubmed_health
             self._pubmed_components_initialized = True
 
-    def _refresh_pubmed_component_health_locked(self, scraper: EnhancedPubMedScraper) -> None:
+    def _refresh_pubmed_component_health_locked(self, scraper: PubMedScraper) -> None:
         """Refresh PubMed component health status."""
         try:
             status_report = scraper.combined_status_report()

@@ -184,7 +184,7 @@ services:
 - ✅ Self-hosting truly optional, not required
 - ✅ Users control their image sources
 
-See: [docker-compose.yml](../docker-compose.yml) header documentation for complete details.
+See: [`docker-compose.yml`](https://github.com/hendrixmm/RAG-Template-for-NVIDIA-nemoretriever/blob/main/docker-compose.yml) header documentation for complete details.
 
 ---
 

@@ -180,11 +180,11 @@ Questions? Contact: [Security Team Contact]
 
 ## References
 
-- Security policy: ../SECURITY.md
+- Security policy: [SECURITY.md](../SECURITY.md)
 - BFG Repo-Cleaner: https://rtyley.github.io/bfg-repo-cleaner/
 - detect‑secrets: https://github.com/Yelp/detect-secrets
 - NVIDIA API key management: https://build.nvidia.com
-- Incident response procedures: see SECURITY.md
+- Incident response procedures: see [SECURITY.md](../SECURITY.md)
 
 ## Appendix: Edge Cases
 

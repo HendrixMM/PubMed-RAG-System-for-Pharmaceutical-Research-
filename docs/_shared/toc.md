@@ -1,75 +1,38 @@
----
-Last Updated: 2025-10-03
-Owner: Documentation Team
-Review Cadence: Monthly
-Purpose: Canonical navigation structure for all project documentation
----
-
-# Documentation Navigation (Canonical TOC)
-
-<!-- TOC -->
-
-- [Getting Started](#getting-started)
-- [Core Documentation](#core-documentation)
-- [Specialized Guides](#specialized-guides)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Architecture & Decisions](#architecture--decisions)
-- [Reference](#reference)
-<!-- /TOC -->
-
-This is the canonical navigation blueprint for the repository. It defines the logical structure of all documentation and should be kept in sync as docs evolve.
+This is the canonical navigation blueprint for the repository. Keep it aligned with `mkdocs.yml` so the published docs match the structure promised here.
 
 ## Getting Started
 
-- [README.md](../../README.md) — Project overview, quick start, and links
-- [QUICK_START.md](../technical-history/QUICK_START.md) — Step-by-step quick start
-- [SETUP_GUIDE.md](../technical-history/SETUP_GUIDE.md) — Detailed environment and setup guide
+- [Home](../index.md) — Project overview, quick links, validation commands
+- [Installation](../INSTALLATION.md) — Environment preparation and dependency setup
+- [Configuration](../CONFIGURATION.md) — Environment variables, feature flags, and validation checks
+- [Quick Start](../technical-history/QUICK_START.md) — Historical CLI walkthrough (still referenced by MkDocs)
 
 ## Core Documentation
 
-- [docs/FEATURES.md](../FEATURES.md) — Full feature list and capabilities
-- [docs/API_REFERENCE.md](../API_REFERENCE.md) — Environment variables, configuration, and API details
-- [docs/EXAMPLES.md](../EXAMPLES.md) — Usage examples and runnable snippets
+- [API Reference](../API_REFERENCE.md) — Environment variables, endpoints, payloads
+- [Examples](../EXAMPLES.md) — Runnable ingestion, retrieval, MCP, and monitoring samples
+- [Benchmarks](../BENCHMARKS.md) — Dataset manifests, orchestration commands, reproducibility notes
 
-## Specialized Guides
+## Architecture Decision Records
 
-- [docs/API_INTEGRATION_GUIDE.md](../API_INTEGRATION_GUIDE.md) — Advanced integration patterns and workflows
-- [docs/PHARMACEUTICAL_BEST_PRACTICES.md](../PHARMACEUTICAL_BEST_PRACTICES.md) — Pharmaceutical domain guidance and safety
-- [docs/NEMO_PIPELINE_GUIDE.md](../NEMO_PIPELINE_GUIDE.md) — NeMo Retriever extraction, embedding, reranking pipeline
-- [docs/NVIDIA_MODEL_ACCESS_GUIDE.md](../NVIDIA_MODEL_ACCESS_GUIDE.md) — Model access tiers and endpoints
-- [docs/NVIDIA_BUILD_SELF_HOSTED_NIM.md](../NVIDIA_BUILD_SELF_HOSTED_NIM.md) — Self-hosted NIM setup
-- [docs/FREE_TIER_MAXIMIZATION.md](../FREE_TIER_MAXIMIZATION.md) — Cost optimization with NVIDIA free tier
-- [docs/CHEAPEST_DEPLOYMENT.md](../CHEAPEST_DEPLOYMENT.md) — Zero-cost, minimal deployment blueprint
+- [Overview](../adr/README.md) — ADR index and authoring guidance
+- [ADR-0001 Use NeMo Retriever](../adr/0001-use-nemo-retriever.md) — Current platform decision
+- [ADR Template](../adr/template.md) — Template for future decisions
 
-## Development
+## Operations
 
-- [docs/DEVELOPMENT.md](../DEVELOPMENT.md) — Developer setup, testing, quality, and workflows
-- [CONTRIBUTING.md](../../CONTRIBUTING.md) — Contribution guidelines
-- [docs/MAINTAINERS.md](../MAINTAINERS.md) — Ownership, SLAs, and review expectations
+- [Troubleshooting Guide](../TROUBLESHOOTING_GUIDE.md) — Decision trees and remediation steps
+- [Monitoring](../MONITORING.md) — Metrics sources, dashboards, escalation hooks
+- [Deployment](../DEPLOYMENT.md) — Cloud-first deployment checklist and runbooks
 
-## Deployment
+## Development & Quality
 
-- [docs/DEPLOYMENT.md](../DEPLOYMENT.md) — Consolidated deployment guide (cloud-first and self-hosted)
+- [Contributing](../CONTRIBUTING.md) — Contribution workflow and review expectations
+- [Development Setup](../DEVELOPMENT.md) — Local environment guidance and testing strategy
+- [Testing](../TESTING.md) — Automated suites, pre-commit requirements, manual validation steps
 
-## Architecture & Decisions
+## Resources
 
-- [docs/ARCHITECTURE.md](../ARCHITECTURE.md) — System architecture overview and components
-- [docs/NGC_DEPRECATION_IMMUNITY.md](../NGC_DEPRECATION_IMMUNITY.md) — NGC API deprecation immunity rationale
-
-## Reference
-
-- [docs/TROUBLESHOOTING_GUIDE.md](../TROUBLESHOOTING_GUIDE.md) — Troubleshooting and maintenance
-- [docs/TROUBLESHOOTING_NVIDIA_BUILD.md](../TROUBLESHOOTING_NVIDIA_BUILD.md) — NVIDIA Build-specific troubleshooting
-- [docs/security/history-redaction.md](../security/history-redaction.md) — Git history cleanup runbook
-- [docs/security/key-rotation-tracker.md](../security/key-rotation-tracker.md) — API key rotation audit log
-- [SECURITY.md](../../SECURITY.md) — Security policy and practices
-- [CHANGELOG.md](../../CHANGELOG.md) — Release notes and changes
-- [docs/\_shared/metadata_template.md](./metadata_template.md) — Template for required documentation metadata
-
----
-
-Maintenance Notes
-
-- Update this file when adding, renaming, or removing docs.
-- Keep section ordering consistent to help users discover content quickly.
+- [Changelog](../CHANGELOG.md) — Release notes and Phase summaries
+- [Roadmap](../ROADMAP.md) — Near-term milestones and future phases
+- [Support](../SUPPORT.md) — Escalation paths, SLAs, and contact channels

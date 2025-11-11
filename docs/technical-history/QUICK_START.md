@@ -165,7 +165,7 @@ pre-commit install
 make test
 ```
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for full development guide.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for full development guide.
 
 ---
 
@@ -267,7 +267,7 @@ EOF
 - **Documentation**: Check `/docs` directory
 - **Issues**: [GitHub Issues](https://github.com/your-org/RAG-Template-for-NVIDIA-nemoretriever/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/your-org/RAG-Template-for-NVIDIA-nemoretriever/discussions)
-- **Security**: See [SECURITY.md](../../SECURITY.md)
+- **Security**: See [SECURITY.md](../SECURITY.md)
 
 ---
 
@@ -287,13 +287,13 @@ After completing this guide, you should have:
 - Explore [pharmaceutical features](../PHARMACEUTICAL_BEST_PRACTICES.md)
 - Set up [PubMed integration](../API_INTEGRATION_GUIDE.md)
 - Learn about [NGC deprecation immunity](../NGC_DEPRECATION_IMMUNITY.md)
-- Read the [full README](../../README.md)
+- Read the [full docs home](../index.md)
 
 ---
 
 **Time to production**: 5 minutes ✓
 **Difficulty**: Beginner-friendly ✓
-**Next**: [Full Documentation](../../README.md)
+**Next**: [Full Documentation](../index.md)
 
 ---
 

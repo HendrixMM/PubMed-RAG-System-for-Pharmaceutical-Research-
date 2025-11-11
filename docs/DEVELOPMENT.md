@@ -78,7 +78,7 @@ Comprehensive guide for setting up the development environment, running tests, m
 
 ## Contributing
 
-- See [CONTRIBUTING.md](../CONTRIBUTING.md) for full guidelines.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 - Commit message conventions and review process.
 
 ## Cross-References
@@ -86,5 +86,5 @@ Comprehensive guide for setting up the development environment, running tests, m
 - API configuration: [docs/API_REFERENCE.md](API_REFERENCE.md)
 - Examples: [docs/EXAMPLES.md](EXAMPLES.md)
 - Runtime troubleshooting: [docs/TROUBLESHOOTING_GUIDE.md](TROUBLESHOOTING_GUIDE.md)
-- Security: [../SECURITY.md](../SECURITY.md)
+- Security: [SECURITY.md](SECURITY.md)
 - Make commands: `Makefile`
