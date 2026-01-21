@@ -1,6 +1,6 @@
 # PubMed RAG System for Pharmaceutical Research
 
-An AI-powered system that retrieves and validates medical literature from PubMed to answer pharmaceutical questions with evidence-based responses.
+An AI-powered system that retrieves and validates medical literature from PubMed to answer pharmaceutical questions with evidence-based responses. 
 
 ## Overview
 
