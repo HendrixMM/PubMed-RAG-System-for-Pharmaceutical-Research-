@@ -75,7 +75,7 @@ This project was developed as an independent learning experience to understand:
 - Multi-source data integration challenges
 - Evidence quality assessment in research contexts
 
-Built by **Hendrix Majumdar-Moreau**, Computer Engineering student at Concordia University, as part of exploring computational approaches to translational neuroscience and drug discovery research.
+Built by **Hendrix Majumdar-Moreau**, Computer Engineering student at Concordia University
 
 ## Contact
 
